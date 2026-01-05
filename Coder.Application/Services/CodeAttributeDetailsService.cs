@@ -17,11 +17,14 @@ namespace Coder.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ICurrentUserService _currentUserService;
 
-        public CodeAttributeDetailsService(IUnitOfWork unitOfWork, IMapper mapper)
+
+        public CodeAttributeDetailsService( IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _currentUserService = currentUserService;
         }
 
         public async Task<ApiResponse<CodeAttributeDetailsDto>> GetByIdAsync(int id)
@@ -85,7 +88,7 @@ namespace Coder.Application.Services
             }
         }
 
-       
+
 
         public async Task<ApiResponse<CodeAttributeDetailsDto>> CreateAsync(CreateCodeAttributeDetailsDto dto)
         {
@@ -99,6 +102,9 @@ namespace Coder.Application.Services
                 var entity = _mapper.Map<CodeAttributeDetails>(dto);
                 if (entity.ParentDetailId <= 0) entity.ParentDetailId = null;
 
+                entity.CreatedBy = _currentUserService.GetUserName();
+                entity.CreatedAt = DateTime.Now;
+
                 var result = await _unitOfWork.CodeAttributeDetails.AddAsync(entity);
                 var resultDto = _mapper.Map<CodeAttributeDetailsDto>(result);
 
@@ -109,7 +115,6 @@ namespace Coder.Application.Services
                 return ApiResponse<CodeAttributeDetailsDto>.InternalServerError(ex.Message);
             }
         }
-
         public async Task<ApiResponse<CodeAttributeDetailsDto>> UpdateAsync(int id, UpdateCodeAttributeDetailsDto dto)
         {
             try

@@ -15,6 +15,5 @@ namespace Coder.Application.DTOs
         public string DescriptionAr { get; set; }
         public string DescriptionEn { get; set; }
         public int? ParentDetailId { get; set; }
-        public string CreatedBy { get; set; }
     }
 }

@@ -33,7 +33,8 @@ namespace Coder.Infrastructure.Data.Configuration
             builder.Property(x => x.DescriptionEn)
                 .HasMaxLength(300);
 
-          
+
+         
 
             builder.Property(x => x.CreatedBy)
                 .HasMaxLength(100);
@@ -44,6 +45,9 @@ namespace Coder.Infrastructure.Data.Configuration
 
             builder.Property(x => x.ApprovedAt)
                 .IsRequired(false);
+
+            builder.Property(x => x.CreatedAt)
+        .HasDefaultValueSql("GETDATE()");
 
             builder.HasIndex(x => x.CodeTypeCode).IsUnique();
 

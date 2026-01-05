@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Coder.Domain.Entities
 {
-    public class CodeTypeSetting
+    public class CodeTypeSetting : MainBaseEntity
     {
         public int Id { get; set; }
         public int CodeTypeId { get; set; }
@@ -14,7 +14,6 @@ namespace Coder.Domain.Entities
         public int SortOrder { get; set; }
         public string Separator { get; set; } = "-";
         public bool IsRequired { get; set; } = true;
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         // Navigation properties
         public virtual CodeType CodeType { get; set; }

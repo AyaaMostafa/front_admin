@@ -12,11 +12,14 @@ namespace Coder.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ICurrentUserService _currentUserService;
 
-        public CodeAttributeMainService(IUnitOfWork unitOfWork, IMapper mapper)
+
+        public CodeAttributeMainService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _currentUserService = currentUserService;
         }
 
         public async Task<ApiResponse<CodeAttributeMainDto>> GetByIdAsync(int id)
@@ -77,6 +80,10 @@ namespace Coder.Application.Services
                     return ApiResponse<CodeAttributeMainDto>.Conflict("Code already exists for this Attribute Type");
 
                 var entity = _mapper.Map<CodeAttributeMain>(dto);
+
+                entity.CreatedBy = _currentUserService.GetUserName();
+                entity.CreatedAt = DateTime.Now;
+
                 var result = await _unitOfWork.CodeAttributeMains.AddAsync(entity);
                 var resultDto = _mapper.Map<CodeAttributeMainDto>(result);
 
@@ -87,7 +94,6 @@ namespace Coder.Application.Services
                 return ApiResponse<CodeAttributeMainDto>.InternalServerError(ex.Message);
             }
         }
-
         public async Task<ApiResponse<CodeAttributeMainDto>> UpdateAsync(int id, UpdateCodeAttributeMainDto dto)
         {
             try

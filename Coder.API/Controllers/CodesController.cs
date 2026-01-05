@@ -47,7 +47,7 @@ namespace Coder.API.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-     
+
 
         [HttpPost(template: "Create")]
         public async Task<ActionResult<ApiResponse<CodeDto>>> CreateAsync([FromBody] CreateCodeDto dto)
@@ -85,4 +85,3 @@ namespace Coder.API.Controllers
         }
     }
 }
-    

@@ -13,6 +13,5 @@ namespace Coder.Application.DTOs
         public string NameEn { get; set; }
         public string DescriptionAr { get; set; }
         public string DescriptionEn { get; set; }
-        public string CreatedBy { get; set; }
     }
 }

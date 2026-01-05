@@ -14,7 +14,18 @@ namespace Coder.Application
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+           services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+            //  HTTP Client for Authentication Service 
+            services.AddHttpClient<IAuthenticationService, AuthenticationService>();
+
+            //  Current User Service (scoped - one per request)
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+            // HTTP Context Accessor ( for CurrentUserService)
+            services.AddHttpContextAccessor();
+
+            // Business Logic Services
             services.AddScoped<ICodeTypeService, CodeTypeService>();
             services.AddScoped<ICodeAttributeTypeService, CodeAttributeTypeService>();
             services.AddScoped<ICodeAttributeMainService, CodeAttributeMainService>();

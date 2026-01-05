@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Coder.Domain.Entities
 {
-    public class CodeTypeSequence
+    public class CodeTypeSequence : MainBaseEntity
     {
 
         public int Id { get; set; }
@@ -16,9 +16,7 @@ namespace Coder.Domain.Entities
         public int MinValue { get; set; } //000 
         public int MaxValue { get; set; } //000123
         public int CurrentValue { get; set; } //3 4 5 6 
-        public bool IsCycling { get; set; } = false;
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-
+        public int IsCycling { get; set; }
         // Navigation properties
         public virtual CodeType CodeType { get; set; }
     }

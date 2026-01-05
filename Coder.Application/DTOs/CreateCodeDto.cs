@@ -16,6 +16,5 @@ namespace Coder.Application.DTOs
         public string CodeGenerated { get; set; }
         public string ExternalSystem { get; set; }
         public string ExternalReferenceId { get; set; }
-        public string CreatedBy { get; set; }
     }
 }

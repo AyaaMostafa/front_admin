@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Coder.Domain.Entities
 {
-    public class CodeAttributeMain
+    public class CodeAttributeMain : MainBaseEntity
     {
         public int Id { get; set; }
         public int CodeTypeId { get; set; }
@@ -17,7 +17,6 @@ namespace Coder.Domain.Entities
         public string DescriptionEn { get; set; }
         public int CodeAttributeTypeId { get; set; }
         public bool IsActive { get; set; } = true;
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public string CreatedBy { get; set; }
 
         // Navigation properties

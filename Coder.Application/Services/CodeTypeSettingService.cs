@@ -17,11 +17,13 @@ namespace Coder.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ICurrentUserService _currentUserService;
 
-        public CodeTypeSettingService(IUnitOfWork unitOfWork, IMapper mapper)
+        public CodeTypeSettingService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _currentUserService = currentUserService;
         }
 
         public async Task<ApiResponse<CodeTypeSettingDto>> GetByIdAsync(int id)

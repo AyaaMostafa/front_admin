@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Coder.Domain.Entities
 {
-    public class Code
+    public class Code : MainBaseEntity
     {
         public int Id { get; set; }
         public int CodeTypeId { get; set; }
@@ -18,7 +18,6 @@ namespace Coder.Domain.Entities
         public string Status { get; set; } = "DRAFT"; // DRAFT / APPROVED / INACTIVE
         public string ExternalSystem { get; set; } // HMS / ERP
         public string ExternalReferenceId { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public string CreatedBy { get; set; }
         public DateTime? ApprovedAt { get; set; }
         public string ApprovedBy { get; set; }

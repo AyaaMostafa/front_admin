@@ -13,6 +13,6 @@ namespace Coder.Application.DTOs
         public int MinValue { get; set; }
         public int MaxValue { get; set; }
         public int CurrentValue { get; set; }
-        public bool IsCycling { get; set; }
+        public int IsCycling { get; set; }
     }
 }

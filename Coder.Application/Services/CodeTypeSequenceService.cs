@@ -6,91 +6,71 @@ using Coder.Application.IServices;
 using Coder.Domain.Entities;
 using Coder.Domain.Interfaces;
 
-
 namespace Coder.Application.Services
 {
     public class CodeTypeSequenceService : ICodeTypeSequenceService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ICurrentUserService _currentUserService;
 
-        public CodeTypeSequenceService(IUnitOfWork unitOfWork, IMapper mapper)
+
+        public CodeTypeSequenceService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _currentUserService = currentUserService;
         }
 
         public async Task<ApiResponse<CodeTypeSequenceDto>> CreateAsync(CreateCodeTypeSequenceDto dto)
         {
             try
             {
-                // Validate Code Type exists
                 var codeType = await _unitOfWork.CodeTypes.GetByIdAsync(dto.CodeTypeId);
                 if (codeType == null)
                     return ApiResponse<CodeTypeSequenceDto>.BadRequest("Code Type does not exist");
 
-                // Check if sequence already exists for this Code Type
-                var exists = await _unitOfWork.CodeTypeSequences.AnyAsync(x => x.CodeTypeId == dto.CodeTypeId);
+                var exists = await _unitOfWork.CodeTypeSequences
+                    .AnyAsync(x => x.CodeTypeId == dto.CodeTypeId);
                 if (exists)
                     return ApiResponse<CodeTypeSequenceDto>.Conflict("Sequence already exists for this Code Type");
 
-                // Validate MinValue < MaxValue
                 if (dto.MinValue >= dto.MaxValue)
                     return ApiResponse<CodeTypeSequenceDto>.BadRequest("MinValue must be less than MaxValue");
 
-                // Validate StartWith is within range
                 if (dto.StartWith < dto.MinValue || dto.StartWith > dto.MaxValue)
                     return ApiResponse<CodeTypeSequenceDto>.BadRequest("StartWith must be between MinValue and MaxValue");
 
-                // Get the last sequence number from all CodeTypeSequences for this CodeType
-                // Order by CreatedAt to get the most recent sequence
-                var lastSequence = await _unitOfWork.CodeTypeSequences
-                    .FindAsync(x => x.CodeTypeId == dto.CodeTypeId);
+               
+                int currentValue = dto.CurrentValue + dto.StartWith;
 
-                int nextSequenceNumber = dto.StartWith;
+                if (currentValue > dto.MaxValue)
+                    return ApiResponse<CodeTypeSequenceDto>.BadRequest($"CurrentValue ({dto.CurrentValue}) + StartWith ({dto.StartWith}) exceeds MaxValue ({dto.MaxValue})");
 
-                // If there are existing sequences, calculate next value
-                if (lastSequence.Any())
-                {
-                    // Get the most recent sequence (ordered by CreatedAt descending)
-                    var mostRecent = lastSequence
-                        .OrderByDescending(x => x.CreatedAt)
-                        .FirstOrDefault();
+                string currentValueStr = currentValue.ToString();
+                int currentLength = currentValueStr.Length;
 
-                    if (mostRecent != null) 
-                    {
-                        nextSequenceNumber = mostRecent.CurrentValue + 1;
+                int zerosCount = dto.IsCycling - currentLength;
+                if (zerosCount < 0)
+                    zerosCount = 0;
 
-                        // Check if next number exceeds MaxValue
-                        if (nextSequenceNumber > dto.MaxValue)
-                        {
-                            if (dto.IsCycling)
-                                nextSequenceNumber = dto.MinValue;
-                            else
-                                return ApiResponse<CodeTypeSequenceDto>.BadRequest(
-                                    $"Next sequence value ({nextSequenceNumber}) exceeds MaxValue ({dto.MaxValue}). Enable cycling or reset the sequence.");
-                        }
-                    }
-                }
+                string finalSequence = new string('0', zerosCount) + currentValueStr;
 
-                // Create new sequence entity
                 var entity = _mapper.Map<CodeTypeSequence>(dto);
-                entity.CurrentValue = nextSequenceNumber;
-                entity.CreatedAt = DateTime.Now;
+                entity.CurrentValue = currentValue;
 
                 var result = await _unitOfWork.CodeTypeSequences.AddAsync(entity);
                 var resultDto = _mapper.Map<CodeTypeSequenceDto>(result);
 
                 return ApiResponse<CodeTypeSequenceDto>.Created(
                     resultDto,
-                    $"Code Type Sequence created successfully with CurrentValue: {nextSequenceNumber}");
+                    $"Code Type Sequence created successfully with SequenceValue: {finalSequence} (CurrentValue: {currentValue})");
             }
             catch (Exception ex)
             {
                 return ApiResponse<CodeTypeSequenceDto>.InternalServerError(ex.Message);
             }
         }
-
 
         public async Task<ApiResponse<CodeTypeSequenceDto>> GetByIdAsync(int id)
         {
@@ -123,7 +103,6 @@ namespace Coder.Application.Services
             }
         }
 
-      
         public async Task<ApiResponse<CodeTypeSequenceDto>> GetByCodeTypeAsync(int codeTypeId)
         {
             try
@@ -132,7 +111,8 @@ namespace Coder.Application.Services
                 if (codeType == null)
                     return ApiResponse<CodeTypeSequenceDto>.NotFound("Code Type not found");
 
-                var entity = await _unitOfWork.CodeTypeSequences.FirstOrDefaultAsync(x => x.CodeTypeId == codeTypeId);
+                var entity = await _unitOfWork.CodeTypeSequences
+                    .FirstOrDefaultAsync(x => x.CodeTypeId == codeTypeId);
                 if (entity == null)
                     return ApiResponse<CodeTypeSequenceDto>.NotFound("Code Type Sequence not found for this Code Type");
 
@@ -153,15 +133,12 @@ namespace Coder.Application.Services
                 if (entity == null)
                     return ApiResponse<CodeTypeSequenceDto>.NotFound("Code Type Sequence not found");
 
-                // Validate MinValue < MaxValue
                 if (dto.MinValue >= dto.MaxValue)
                     return ApiResponse<CodeTypeSequenceDto>.BadRequest("MinValue must be less than MaxValue");
 
-                // Validate StartWith is within range
                 if (dto.StartWith < dto.MinValue || dto.StartWith > dto.MaxValue)
                     return ApiResponse<CodeTypeSequenceDto>.BadRequest("StartWith must be between MinValue and MaxValue");
 
-                // Validate CurrentValue is within range
                 if (dto.CurrentValue < dto.MinValue || dto.CurrentValue > dto.MaxValue)
                     return ApiResponse<CodeTypeSequenceDto>.BadRequest("CurrentValue must be between MinValue and MaxValue");
 
@@ -205,7 +182,8 @@ namespace Coder.Application.Services
                 if (codeType == null)
                     return ApiResponse<object>.NotFound("Code Type not found");
 
-                var sequence = await _unitOfWork.CodeTypeSequences.FirstOrDefaultAsync(x => x.CodeTypeId == codeTypeId);
+                var sequence = await _unitOfWork.CodeTypeSequences
+                    .FirstOrDefaultAsync(x => x.CodeTypeId == codeTypeId);
                 if (sequence == null)
                     return ApiResponse<object>.NotFound("Code Type Sequence not found");
 
@@ -213,17 +191,36 @@ namespace Coder.Application.Services
 
                 if (nextValue > sequence.MaxValue)
                 {
-                    if (sequence.IsCycling)
-                        nextValue = sequence.MinValue;
+                    if (sequence.IsCycling > 0)
+                    {
+                        nextValue = sequence.MinValue + sequence.StartWith;
+                    }
                     else
-                        return ApiResponse<object>.BadRequest("Sequence has reached its maximum value");
+                    {
+                        return ApiResponse<object>.BadRequest(
+                            $"Sequence has reached its maximum value ({sequence.MaxValue}). Enable cycling to continue.");
+                    }
                 }
+
+                string nextValueStr = nextValue.ToString();
+                int nextLength = nextValueStr.Length;
+
+                int zerosCount = sequence.IsCycling - nextLength;
+                if (zerosCount < 0)
+                    zerosCount = 0;
+
+                string finalSequence = new string('0', zerosCount) + nextValueStr;
 
                 sequence.CurrentValue = nextValue;
                 await _unitOfWork.CodeTypeSequences.UpdateAsync(sequence);
 
                 return ApiResponse<object>.Success(
-                    new { value = nextValue, codeTypeId = codeTypeId },
+                    new
+                    {
+                        value = nextValue,
+                        formattedValue = finalSequence,
+                        codeTypeId = codeTypeId
+                    },
                     "Next sequence value retrieved successfully");
             }
             catch (Exception ex)
@@ -233,4 +230,3 @@ namespace Coder.Application.Services
         }
     }
 }
-

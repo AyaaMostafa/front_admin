@@ -33,7 +33,7 @@ namespace Coder.API.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-     
+
 
         [HttpGet(template: "GetByCodeType")]
         public async Task<ActionResult<ApiResponse<List<CodeTypeSettingDto>>>> GetByCodeTypeAsync(int codeTypeId)
@@ -72,4 +72,3 @@ namespace Coder.API.Controllers
     }
 }
 
-    

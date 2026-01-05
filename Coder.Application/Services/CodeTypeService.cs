@@ -17,11 +17,14 @@ namespace Coder.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ICurrentUserService _currentUserService;
 
-        public CodeTypeService(IUnitOfWork unitOfWork, IMapper mapper)
+
+        public CodeTypeService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _currentUserService = currentUserService;
         }
 
         public async Task<ApiResponse<CodeTypeDto>> GetByIdAsync(int id)
@@ -56,20 +59,25 @@ namespace Coder.Application.Services
         }
 
 
-     
+
 
         public async Task<ApiResponse<CodeTypeDto>> CreateAsync(CreateCodeTypeDto dto)
         {
             try
             {
-                var exists = await _unitOfWork.CodeTypes.AnyAsync(x => x.CodeTypeCode == dto.CodeTypeCode);
+                var exists = await _unitOfWork.CodeTypes.AnyAsync(x =>
+                    x.CodeTypeCode == dto.CodeTypeCode);
                 if (exists)
                     return ApiResponse<CodeTypeDto>.Conflict("Code Type Code already exists");
 
                 var entity = _mapper.Map<CodeType>(dto);
+
+                // Set CreatedBy from current user
+                entity.CreatedBy = _currentUserService.GetUserName();
+                entity.CreatedAt = DateTime.Now;
+
                 var result = await _unitOfWork.CodeTypes.AddAsync(entity);
                 var resultDto = _mapper.Map<CodeTypeDto>(result);
-
                 return ApiResponse<CodeTypeDto>.Created(resultDto, "Code Type created successfully");
             }
             catch (Exception ex)
@@ -124,10 +132,10 @@ namespace Coder.Application.Services
                     return ApiResponse<CodeTypeDto>.NotFound("Code Type not found");
 
                 entity.ApprovedAt = DateTime.Now;
-                entity.ApprovedBy = approvedBy;
+                entity.ApprovedBy = _currentUserService.GetUserName();
+
                 var result = await _unitOfWork.CodeTypes.UpdateAsync(entity);
                 var resultDto = _mapper.Map<CodeTypeDto>(result);
-
                 return ApiResponse<CodeTypeDto>.Success(resultDto, "Code Type approved successfully");
             }
             catch (Exception ex)

@@ -13,11 +13,14 @@ namespace Coder.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ICurrentUserService _currentUserService;
 
-        public CodeAttributeTypeService(IUnitOfWork unitOfWork, IMapper mapper)
+
+        public CodeAttributeTypeService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _currentUserService = currentUserService;
         }
 
         public async Task<ApiResponse<CodeAttributeTypeDto>> GetByIdAsync(int id)
@@ -53,16 +56,19 @@ namespace Coder.Application.Services
 
 
 
-   
+
 
         public async Task<ApiResponse<CodeAttributeTypeDto>> CreateAsync(CreateCodeAttributeTypeDto dto)
         {
             try
             {
                 var entity = _mapper.Map<CodeAttributeType>(dto);
+
+                entity.CreatedBy = _currentUserService.GetUserName();
+                entity.CreatedAt = DateTime.Now;
+
                 var result = await _unitOfWork.CodeAttributeTypes.AddAsync(entity);
                 var resultDto = _mapper.Map<CodeAttributeTypeDto>(result);
-
                 return ApiResponse<CodeAttributeTypeDto>.Created(resultDto, "Code Attribute Type created successfully");
             }
             catch (Exception ex)
@@ -70,7 +76,6 @@ namespace Coder.Application.Services
                 return ApiResponse<CodeAttributeTypeDto>.InternalServerError(ex.Message);
             }
         }
-
         public async Task<ApiResponse<CodeAttributeTypeDto>> UpdateAsync(int id, UpdateCodeAttributeTypeDto dto)
         {
             try

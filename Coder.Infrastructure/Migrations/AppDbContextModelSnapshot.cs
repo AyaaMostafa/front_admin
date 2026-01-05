@@ -38,6 +38,15 @@ namespace Coder.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int?>("CancelComputerID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CancelDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("CancelUserID")
+                        .HasColumnType("int");
+
                     b.Property<string>("CodeGenerated")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -55,6 +64,12 @@ namespace Coder.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DescriptionAr")
                         .IsRequired()
@@ -76,6 +91,9 @@ namespace Coder.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("NameAr")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -86,12 +104,24 @@ namespace Coder.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<int?>("RegComputerID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("RegDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("RegUserID")
+                        .HasColumnType("int");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)")
                         .HasDefaultValue("DRAFT");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -112,6 +142,15 @@ namespace Coder.Infrastructure.Migrations
                     b.Property<int>("AttributeMainId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CancelComputerID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CancelDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("CancelUserID")
+                        .HasColumnType("int");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -127,6 +166,12 @@ namespace Coder.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("DescriptionAr")
                         .IsRequired()
                         .HasMaxLength(300)
@@ -138,6 +183,9 @@ namespace Coder.Infrastructure.Migrations
                         .HasColumnType("nvarchar(300)");
 
                     b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("NameAr")
@@ -152,6 +200,18 @@ namespace Coder.Infrastructure.Migrations
 
                     b.Property<int?>("ParentDetailId")
                         .HasColumnType("int");
+
+                    b.Property<int?>("RegComputerID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("RegDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("RegUserID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -170,6 +230,15 @@ namespace Coder.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CancelComputerID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CancelDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("CancelUserID")
+                        .HasColumnType("int");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -192,6 +261,12 @@ namespace Coder.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("DescriptionAr")
                         .IsRequired()
                         .HasMaxLength(300)
@@ -205,6 +280,9 @@ namespace Coder.Infrastructure.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("NameAr")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -214,6 +292,18 @@ namespace Coder.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
+
+                    b.Property<int?>("RegComputerID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("RegDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("RegUserID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -231,6 +321,15 @@ namespace Coder.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("CancelComputerID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CancelDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("CancelUserID")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -240,6 +339,12 @@ namespace Coder.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DescriptionAr")
                         .IsRequired()
@@ -254,6 +359,9 @@ namespace Coder.Infrastructure.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("NameAr")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -263,6 +371,18 @@ namespace Coder.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("RegComputerID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("RegDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("RegUserID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -281,9 +401,17 @@ namespace Coder.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ApprovedBy")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("CancelComputerID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CancelDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("CancelUserID")
+                        .HasColumnType("int");
 
                     b.Property<string>("CodeTypeCode")
                         .IsRequired()
@@ -291,12 +419,20 @@ namespace Coder.Infrastructure.Migrations
                         .HasColumnType("nvarchar(30)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DescriptionAr")
                         .IsRequired()
@@ -311,6 +447,9 @@ namespace Coder.Infrastructure.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("NameAr")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -320,6 +459,18 @@ namespace Coder.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
+
+                    b.Property<int?>("RegComputerID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("RegDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("RegUserID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -337,6 +488,15 @@ namespace Coder.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("CancelComputerID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CancelDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("CancelUserID")
+                        .HasColumnType("int");
+
                     b.Property<int>("CodeTypeId")
                         .HasColumnType("int");
 
@@ -348,7 +508,16 @@ namespace Coder.Infrastructure.Migrations
                     b.Property<int>("CurrentValue")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsCycling")
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("IsCycling")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<int>("MaxValue")
@@ -362,10 +531,22 @@ namespace Coder.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int?>("RegComputerID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("RegDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("RegUserID")
+                        .HasColumnType("int");
+
                     b.Property<int>("StartWith")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(1);
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -385,6 +566,15 @@ namespace Coder.Infrastructure.Migrations
                     b.Property<int>("AttributeDetailId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CancelComputerID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CancelDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("CancelUserID")
+                        .HasColumnType("int");
+
                     b.Property<int>("CodeTypeId")
                         .HasColumnType("int");
 
@@ -393,8 +583,26 @@ namespace Coder.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsRequired")
                         .HasColumnType("bit");
+
+                    b.Property<int?>("RegComputerID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("RegDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("RegUserID")
+                        .HasColumnType("int");
 
                     b.Property<string>("Separator")
                         .IsRequired()
@@ -405,6 +613,9 @@ namespace Coder.Infrastructure.Migrations
 
                     b.Property<int>("SortOrder")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 

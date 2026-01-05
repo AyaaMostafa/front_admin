@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Coder.Domain.Entities
 {
-    public class CodeType
+    public class CodeType : MainBaseEntity
     {
         public int Id { get; set; }
         public string CodeTypeCode { get; set; }
@@ -15,7 +15,6 @@ namespace Coder.Domain.Entities
         public string DescriptionAr { get; set; }
         public string DescriptionEn { get; set; }
         public bool IsActive { get; set; } = true;
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public string CreatedBy { get; set; }
         public DateTime? ApprovedAt { get; set; }
         public string? ApprovedBy { get; set; }
