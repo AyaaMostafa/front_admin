@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/shared/layouts/main-layout/main-layout.component.css"],
+  "sourcesContent": [".app-container {\r\n    display: flex;\r\n    min-height: 100vh;\r\n    background: #f9fafb;\r\n}\r\n\r\n.main-wrapper {\r\n    flex: 1;\r\n    display: flex;\r\n    flex-direction: column;\r\n    margin-left: 260px;\r\n    transition: margin-left 0.3s ease;\r\n    min-height: 100vh;\r\n}\r\n\r\n.main-wrapper.sidebar-collapsed {\r\n    margin-left: 70px;\r\n}\r\n\r\n.main-content {\r\n    flex: 1;\r\n    padding: 1.5rem;\r\n    overflow-y: auto;\r\n}\r\n\r\n.content-container {\r\n    max-width: 1400px;\r\n    margin: 0 auto;\r\n}\r\n\r\n/* Responsive */\r\n@media (max-width: 768px) {\r\n    .main-wrapper {\r\n        margin-left: 0;\r\n    }\r\n\r\n    .main-wrapper.sidebar-collapsed {\r\n        margin-left: 0;\r\n    }\r\n\r\n    .main-content {\r\n        padding: 1rem;\r\n    }\r\n}"],
+  "mappings": ";AAAA,CAAC;AACG,WAAS;AACT,cAAY;AACZ,cAAY;AAChB;AAEA,CAAC;AACG,QAAM;AACN,WAAS;AACT,kBAAgB;AAChB,eAAa;AACb,cAAY,YAAY,KAAK;AAC7B,cAAY;AAChB;AAEA,CATC,YASY,CAAC;AACV,eAAa;AACjB;AAEA,CAAC;AACG,QAAM;AACN,WAAS;AACT,cAAY;AAChB;AAEA,CAAC;AACG,aAAW;AACX,UAAQ,EAAE;AACd;AAGA,OAAO,CAAC,SAAS,EAAE;AACf,GA1BH;AA2BO,iBAAa;AACjB;AAEA,GA9BH,YA8BgB,CArBH;AAsBN,iBAAa;AACjB;AAEA,GArBH;AAsBO,aAAS;AACb;AACJ;",
+  "names": []
+}

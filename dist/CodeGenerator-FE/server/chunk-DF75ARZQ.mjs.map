@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/features/settings/settings.component.ts", "src/app/features/settings/settings.component.html"],
+  "sourcesContent": ["import { Component } from '@angular/core';\r\nimport { CommonModule } from '@angular/common';\r\n\r\n@Component({\r\n    selector: 'app-settings',\r\n    standalone: true,\r\n    imports: [CommonModule],\r\n    templateUrl: './settings.component.html',\r\n    styleUrl: './settings.component.css'\r\n})\r\nexport class SettingsComponent {\r\n    // Settings logic\r\n}\r\n", "<div class=\"settings-container\">\r\n    <h1>Settings</h1>\r\n    <p>Configure your application preferences here.</p>\r\n</div>"],
+  "mappings": ";;;;;;;;;;;;;;AAUM,IAAO,oBAAP,MAAO,mBAAiB;;qCAAjB,oBAAiB;EAAA;yEAAjB,oBAAiB,WAAA,CAAA,CAAA,cAAA,CAAA,GAAA,OAAA,GAAA,MAAA,GAAA,QAAA,CAAA,CAAA,GAAA,oBAAA,CAAA,GAAA,UAAA,SAAA,2BAAA,IAAA,KAAA;AAAA,QAAA,KAAA,GAAA;ACV9B,MAAA,4BAAA,GAAA,OAAA,CAAA,EAAgC,GAAA,IAAA;AACxB,MAAA,iBAAA,GAAA,UAAA;AAAQ,MAAA,0BAAA;AACZ,MAAA,4BAAA,GAAA,GAAA;AAAG,MAAA,iBAAA,GAAA,8CAAA;AAA4C,MAAA,0BAAA,EAAI;;oBDIzC,YAAY,GAAA,QAAA,CAAA,kNAAA,EAAA,CAAA;;;sEAIb,mBAAiB,CAAA;UAP7B;uBACa,gBAAc,YACZ,MAAI,SACP,CAAC,YAAY,GAAC,UAAA,kIAAA,QAAA,CAAA,kOAAA,EAAA,CAAA;;;;6EAId,mBAAiB,EAAA,WAAA,qBAAA,UAAA,mDAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
+  "names": []
+}

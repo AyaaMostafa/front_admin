@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/environments/environment.ts"],
+  "sourcesContent": ["export const environment = {\r\n    production: false,\r\n    apiUrl: 'https://localhost:7191/api',\r\n    appName: 'Code Generator',\r\n    version: '1.0.0',\r\n    defaultLanguage: 'en',\r\n    supportedLanguages: ['en', 'ar'],\r\n    enableDebugMode: true\r\n};\r\n"],
+  "mappings": ";AAAO,IAAM,cAAc;EACvB,YAAY;EACZ,QAAQ;EACR,SAAS;EACT,SAAS;EACT,iBAAiB;EACjB,oBAAoB,CAAC,MAAM,IAAI;EAC/B,iBAAiB;;",
+  "names": []
+}

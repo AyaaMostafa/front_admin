@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/features/settings/settings.component.css"],
+  "sourcesContent": [".settings-container {\r\n    padding: 2rem;\r\n}\r\n\r\nh1 {\r\n    font-size: 2rem;\r\n    color: #1a202c;\r\n    margin-bottom: 1rem;\r\n}"],
+  "mappings": ";AAAA,CAAC;AACG,WAAS;AACb;AAEA;AACI,aAAW;AACX,SAAO;AACP,iBAAe;AACnB;",
+  "names": []
+}
