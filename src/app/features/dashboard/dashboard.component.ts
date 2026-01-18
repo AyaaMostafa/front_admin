@@ -61,11 +61,6 @@ export class DashboardComponent implements OnInit {
 
     openCard(index: number): void {
         this.clearError();
-        if (!this.canAccess(index)) {
-            const prevName = this.cardNames[index - 1] || 'previous step';
-            this.errorMessage = `Can't access without completing ${prevName.toLowerCase()} first`;
-            return;
-        }
         this.router.navigate([this.cardRoutes[index]]);
     }
 

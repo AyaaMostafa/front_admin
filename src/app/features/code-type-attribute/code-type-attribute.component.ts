@@ -19,7 +19,7 @@ export class CodeTypeAttributeComponent implements OnInit {
     successMessage = '';
 
     currentEntry = 0;
-    totalEntries = 3;
+    totalEntries = 0; // Removed the hardcoded limit of 3
     savedIds: number[] = [];
 
     constructor(
@@ -53,19 +53,10 @@ export class CodeTypeAttributeComponent implements OnInit {
                     this.savedIds.push(response.data.id);
                     this.codeGeneratorService.addCodeAttributeTypeId(response.data.id);
 
-                    if (this.currentEntry < this.totalEntries - 1) {
-                        this.currentEntry++;
-                        this.successMessage = `Attribute ${this.currentEntry}/${this.totalEntries} saved!`;
-                        this.attributeForm.reset();
-                        this.isLoading = false;
-                    } else {
-                        this.successMessage = 'All 3 attributes saved successfully!';
-                        this.codeGeneratorService.completeStep(1);
-
-                        setTimeout(() => {
-                            this.router.navigate(['/code-type-main']);
-                        }, 1000);
-                    }
+                    this.totalEntries++;
+                    this.successMessage = `Attribute ${this.totalEntries} saved!`;
+                    this.attributeForm.reset();
+                    this.isLoading = false;
                 },
                 error: (error) => {
                     this.isLoading = false;
@@ -77,6 +68,20 @@ export class CodeTypeAttributeComponent implements OnInit {
                 this.attributeForm.get(key)?.markAsTouched();
             });
         }
+    }
+
+    onComplete() {
+        if (this.totalEntries < 1) {
+            this.errorMessage = 'You must create at least one attribute before proceeding.';
+            return;
+        }
+
+        this.successMessage = 'All attributes saved successfully!';
+        this.codeGeneratorService.completeStep(1);
+
+        setTimeout(() => {
+            this.router.navigate(['/code-type-main']);
+        }, 1000);
     }
 
     get nameAr() { return this.attributeForm.get('nameAr'); }

@@ -6,6 +6,35 @@ import { environment } from '../../../environments/environment';
 import { User, LoginResponse, LoginCredentials, RegisterData } from '../models';
 import { STORAGE_KEYS, API_ENDPOINTS, ROUTES } from '../constants';
 
+/**
+ * Utility function to safely access localStorage
+ */
+function safeLocalStorageGetItem(key: string): string | null {
+    if (typeof localStorage !== 'undefined' && localStorage.getItem) {
+        try {
+            return localStorage.getItem(key);
+        } catch (error) {
+            console.error('Error accessing localStorage:', error);
+            return null;
+        }
+    } else {
+        console.warn('localStorage is not available in this environment.');
+        return null;
+    }
+}
+
+function safeLocalStorageSetItem(key: string, value: string): void {
+    if (typeof localStorage !== 'undefined' && localStorage.setItem) {
+        try {
+            localStorage.setItem(key, value);
+        } catch (error) {
+            console.error('Error accessing localStorage:', error);
+        }
+    } else {
+        console.warn('localStorage is not available in this environment.');
+    }
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -70,7 +99,7 @@ export class AuthService {
      * Get current auth token
      */
     getToken(): string | null {
-        return localStorage.getItem(STORAGE_KEYS.TOKEN);
+        return safeLocalStorageGetItem(STORAGE_KEYS.TOKEN);
     }
 
     /**
@@ -132,7 +161,7 @@ export class AuthService {
      */
     private handleLoginSuccess(data: any): void {
         // Store token
-        localStorage.setItem(STORAGE_KEYS.TOKEN, data.token);
+        safeLocalStorageSetItem(STORAGE_KEYS.TOKEN, data.token);
 
         // Create user object
         const user: User = {
@@ -146,7 +175,7 @@ export class AuthService {
         };
 
         // Store user data
-        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+        safeLocalStorageSetItem(STORAGE_KEYS.USER, JSON.stringify(user));
 
         // Update state
         this.currentUserSubject.next(user);
@@ -186,7 +215,7 @@ export class AuthService {
      */
     private getUserFromStorage(): User | null {
         try {
-            const userJson = localStorage.getItem(STORAGE_KEYS.USER);
+            const userJson = safeLocalStorageGetItem(STORAGE_KEYS.USER);
             if (!userJson) return null;
 
             const user = JSON.parse(userJson);
