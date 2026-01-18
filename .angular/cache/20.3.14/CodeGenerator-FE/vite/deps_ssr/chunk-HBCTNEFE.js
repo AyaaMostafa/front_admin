@@ -1,14 +1,14 @@
 import { createRequire } from 'module';const require = createRequire(import.meta.url);
 import {
+  withHttpTransferCache
+} from "./chunk-USUOAZDH.js";
+import {
   CommonModule,
   DomAdapter,
   PLATFORM_BROWSER_ID,
   getDOM,
   setRootDomAdapter
-} from "./chunk-HS7UGI3M.js";
-import {
-  withHttpTransferCache
-} from "./chunk-T3I7JI4T.js";
+} from "./chunk-LWMCOWMQ.js";
 import {
   XhrFactory,
   parseCookieValue
@@ -74,7 +74,7 @@ import {
   ɵɵdefineInjector,
   ɵɵdefineNgModule,
   ɵɵinject
-} from "./chunk-K3LV6W2H.js";
+} from "./chunk-PMO55XIJ.js";
 import {
   __spreadProps,
   __spreadValues
@@ -2035,4 +2035,4 @@ export {
    * License: MIT
    *)
 */
-//# sourceMappingURL=chunk-G6NW55JG.js.map
+//# sourceMappingURL=chunk-HBCTNEFE.js.map
