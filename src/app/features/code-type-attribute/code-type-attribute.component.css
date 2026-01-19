@@ -26,6 +26,7 @@
     padding: 2rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     border: 1px solid #e5e7eb;
+    margin-bottom: 2rem;
 }
 
 .card h3 {
@@ -179,5 +180,127 @@ textarea {
 @media (max-width: 768px) {
     .form-row {
         grid-template-columns: 1fr;
+    }
+}
+
+/* Attributes List Styles */
+.attributes-list {
+    margin-top: 2rem;
+}
+
+.attributes-table {
+    margin: 1.5rem 0;
+}
+
+.attribute-item {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s;
+}
+
+.attribute-item:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.attribute-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.attribute-header h4 {
+    color: #667eea;
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.btn-delete {
+    background: #ef4444;
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.btn-delete:hover:not(:disabled) {
+    background: #dc2626;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+}
+
+.attribute-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.detail-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.detail-item strong {
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.detail-item span {
+    color: #1a202c;
+    font-size: 1rem;
+    padding: 0.5rem;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #e5e7eb;
+}
+
+.save-all-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid #e5e7eb;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 1rem 3rem;
+    font-size: 1.125rem;
+}
+
+.btn-success:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+}
+
+.btn-success:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+@media (max-width: 768px) {
+    .detail-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .attribute-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
     }
 }

@@ -1,12 +1,12 @@
 <div class="code-details-container">
     <div class="header">
         <h2>Code Details</h2>
-        <p class="description">Define details - Entry {{ currentEntry + 1 }} of {{ totalEntries }}</p>
+        <p class="description">Define details - {{ details.length }} of {{ attributeMainIds.length }} entries added</p>
     </div>
 
     <div class="content">
         <div class="card">
-            <h3>Detail {{ currentEntry + 1 }} Configuration</h3>
+            <h3>Add New Detail Entry</h3>
 
             @if (successMessage) {
             <div class="alert alert-success">{{ successMessage }}</div>
@@ -14,12 +14,6 @@
 
             @if (errorMessage) {
             <div class="alert alert-error">{{ errorMessage }}</div>
-            }
-
-            @if (savedCodes.length > 0) {
-            <div class="saved-info">
-                <strong>Saved:</strong> {{ savedCodes.join(', ') }}
-            </div>
             }
 
             <form [formGroup]="detailForm" (ngSubmit)="onSubmit()" class="form">
@@ -82,13 +76,74 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" [disabled]="isLoading">
-                        @if (isLoading) {
-                        <span class="spinner"></span>
-                        Saving...
-                        } @else if (currentEntry < totalEntries - 1) { Save & Next } @else { Save & Continue } </button>
+                    <button type="submit" class="btn btn-primary" [disabled]="isLoading || details.length >= attributeMainIds.length">
+                        Add Detail
+                    </button>
                 </div>
             </form>
         </div>
+
+        @if (details.length > 0) {
+        <div class="card details-list">
+            <h3>Added Detail Entries ({{ details.length }}/{{ attributeMainIds.length }})</h3>
+            <p>Review your detail entries before saving</p>
+            
+            <div class="details-table">
+                @for (detail of details; track $index) {
+                <div class="detail-item">
+                    <div class="detail-header">
+                        <h4>Detail Entry #{{ $index + 1 }}</h4>
+                        <button type="button" class="btn btn-delete" (click)="removeDetail($index)" [disabled]="isLoading">
+                            ✕ Remove
+                        </button>
+                    </div>
+                    <div class="detail-details">
+                        <div class="detail-row">
+                            <div class="detail-field">
+                                <strong>Code:</strong>
+                                <span>{{ detail.code }}</span>
+                            </div>
+                            <div class="detail-field">
+                                <strong>Sort Order:</strong>
+                                <span>{{ detail.sortOrder }}</span>
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-field">
+                                <strong>Name (Arabic):</strong>
+                                <span dir="rtl">{{ detail.nameAr }}</span>
+                            </div>
+                            <div class="detail-field">
+                                <strong>Name (English):</strong>
+                                <span>{{ detail.nameEn }}</span>
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-field">
+                                <strong>Description (Arabic):</strong>
+                                <span dir="rtl">{{ detail.descriptionAr }}</span>
+                            </div>
+                            <div class="detail-field">
+                                <strong>Description (English):</strong>
+                                <span>{{ detail.descriptionEn }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+
+            <div class="save-all-actions">
+                <button type="button" class="btn btn-success" (click)="saveAllDetails()" [disabled]="isLoading || details.length !== attributeMainIds.length">
+                    @if (isLoading) {
+                    <span class="spinner"></span>
+                    Saving All Details...
+                    } @else {
+                    Save All Details & Continue
+                    }
+                </button>
+            </div>
+        </div>
+        }
     </div>
 </div>

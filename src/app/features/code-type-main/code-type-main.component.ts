@@ -18,8 +18,7 @@ export class CodeTypeMainComponent implements OnInit {
     errorMessage = '';
     successMessage = '';
 
-    currentEntry = 0;
-    totalEntries = 3;
+    mains: any[] = [];
     savedIds: number[] = [];
 
     codeTypeId!: number;
@@ -37,7 +36,7 @@ export class CodeTypeMainComponent implements OnInit {
         this.codeTypeId = state.codeTypeId!;
         this.codeAttributeTypeIds = state.codeAttributeTypeIds;
 
-        if (!this.codeTypeId || this.codeAttributeTypeIds.length !== 3) {
+        if (!this.codeTypeId || this.codeAttributeTypeIds.length === 0) {
             this.errorMessage = 'Missing required data. Please complete previous steps.';
             return;
         }
@@ -56,46 +55,89 @@ export class CodeTypeMainComponent implements OnInit {
     }
 
     onSubmit() {
-        if (this.mainForm.valid && !this.isLoading) {
-            this.isLoading = true;
-            this.errorMessage = '';
-            this.successMessage = '';
+        if (this.mainForm.valid) {
+            this.addMain();
+        } else {
+            Object.keys(this.mainForm.controls).forEach(key => {
+                this.mainForm.get(key)?.markAsTouched();
+            });
+        }
+    }
 
+    addMain() {
+        if (this.mainForm.valid) {
+            if (this.mains.length >= this.codeAttributeTypeIds.length) {
+                this.errorMessage = `You can only add ${this.codeAttributeTypeIds.length} main entries (one for each attribute type).`;
+                return;
+            }
+
+            this.mains.push({ ...this.mainForm.value });
+            this.successMessage = `Main added! Total: ${this.mains.length}`;
+            this.mainForm.reset();
+            this.errorMessage = '';
+            
+            setTimeout(() => {
+                this.successMessage = '';
+            }, 2000);
+        }
+    }
+
+    removeMain(index: number) {
+        this.mains.splice(index, 1);
+        this.successMessage = `Main removed! Total: ${this.mains.length}`;
+        
+        setTimeout(() => {
+            this.successMessage = '';
+        }, 2000);
+    }
+
+    saveAllMains() {
+        if (this.mains.length === 0) {
+            this.errorMessage = 'Please add at least one main entry before saving.';
+            return;
+        }
+
+        if (this.mains.length !== this.codeAttributeTypeIds.length) {
+            this.errorMessage = `You must add exactly ${this.codeAttributeTypeIds.length} main entries (one for each attribute type).`;
+            return;
+        }
+
+        this.isLoading = true;
+        this.errorMessage = '';
+        this.successMessage = '';
+
+        let completedCount = 0;
+        const totalCount = this.mains.length;
+
+        this.mains.forEach((main, index) => {
             const requestData = {
-                ...this.mainForm.value,
+                ...main,
                 codeTypeId: this.codeTypeId,
-                codeAttributeTypeId: this.codeAttributeTypeIds[this.currentEntry]
+                codeAttributeTypeId: this.codeAttributeTypeIds[index]
             };
 
             this.codeAttributeMainService.createCodeAttributeMain(requestData).subscribe({
                 next: (response) => {
                     this.savedIds.push(response.data.id);
                     this.codeGeneratorService.addCodeAttributeMainId(response.data.id);
+                    completedCount++;
 
-                    if (this.currentEntry < this.totalEntries - 1) {
-                        this.currentEntry++;
-                        this.successMessage = `Main ${this.currentEntry}/${this.totalEntries} saved!`;
-                        this.mainForm.reset();
+                    if (completedCount === totalCount) {
                         this.isLoading = false;
-                    } else {
-                        this.successMessage = 'All 3 mains saved successfully!';
+                        this.successMessage = `All ${totalCount} mains saved successfully!`;
                         this.codeGeneratorService.completeStep(2);
-
+                        
                         setTimeout(() => {
                             this.router.navigate(['/code-details']);
-                        }, 1000);
+                        }, 1500);
                     }
                 },
                 error: (error) => {
                     this.isLoading = false;
-                    this.errorMessage = error.error?.message || 'Failed to create code attribute main. Please try again.';
+                    this.errorMessage = error.error?.message || `Failed to save main ${index + 1}. Please try again.`;
                 }
             });
-        } else {
-            Object.keys(this.mainForm.controls).forEach(key => {
-                this.mainForm.get(key)?.markAsTouched();
-            });
-        }
+        });
     }
 
     get code() { return this.mainForm.get('code'); }

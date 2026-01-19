@@ -18,8 +18,7 @@ export class CodeTypeAttributeComponent implements OnInit {
     errorMessage = '';
     successMessage = '';
 
-    currentEntry = 0;
-    totalEntries = 0; // Removed the hardcoded limit of 3
+    attributes: any[] = [];
     savedIds: number[] = [];
 
     constructor(
@@ -43,26 +42,8 @@ export class CodeTypeAttributeComponent implements OnInit {
     }
 
     onSubmit() {
-        if (this.attributeForm.valid && !this.isLoading) {
-            this.isLoading = true;
-            this.errorMessage = '';
-            this.successMessage = '';
-
-            this.codeAttributeTypeService.createCodeAttributeType(this.attributeForm.value).subscribe({
-                next: (response) => {
-                    this.savedIds.push(response.data.id);
-                    this.codeGeneratorService.addCodeAttributeTypeId(response.data.id);
-
-                    this.totalEntries++;
-                    this.successMessage = `Attribute ${this.totalEntries} saved!`;
-                    this.attributeForm.reset();
-                    this.isLoading = false;
-                },
-                error: (error) => {
-                    this.isLoading = false;
-                    this.errorMessage = error.error?.message || 'Failed to create code attribute type. Please try again.';
-                }
-            });
+        if (this.attributeForm.valid) {
+            this.addAttribute();
         } else {
             Object.keys(this.attributeForm.controls).forEach(key => {
                 this.attributeForm.get(key)?.markAsTouched();
@@ -70,19 +51,67 @@ export class CodeTypeAttributeComponent implements OnInit {
         }
     }
 
-    onComplete() {
-        if (this.totalEntries < 1) {
-            this.errorMessage = 'You must create at least one attribute before proceeding.';
+    addAttribute() {
+        if (this.attributeForm.valid) {
+            this.attributes.push({ ...this.attributeForm.value });
+            this.successMessage = `Attribute added! Total: ${this.attributes.length}`;
+            this.attributeForm.reset();
+            this.errorMessage = '';
+            
+            setTimeout(() => {
+                this.successMessage = '';
+            }, 2000);
+        }
+    }
+
+    removeAttribute(index: number) {
+        this.attributes.splice(index, 1);
+        this.successMessage = `Attribute removed! Total: ${this.attributes.length}`;
+        
+        setTimeout(() => {
+            this.successMessage = '';
+        }, 2000);
+    }
+
+    saveAllAttributes() {
+        if (this.attributes.length === 0) {
+            this.errorMessage = 'Please add at least one attribute before saving.';
             return;
         }
 
-        this.successMessage = 'All attributes saved successfully!';
-        this.codeGeneratorService.completeStep(1);
+        this.isLoading = true;
+        this.errorMessage = '';
+        this.successMessage = '';
 
-        setTimeout(() => {
-            this.router.navigate(['/code-type-main']);
-        }, 1000);
+        let completedCount = 0;
+        const totalCount = this.attributes.length;
+
+        this.attributes.forEach((attribute, index) => {
+            this.codeAttributeTypeService.createCodeAttributeType(attribute).subscribe({
+                next: (response) => {
+                    this.savedIds.push(response.data.id);
+                    this.codeGeneratorService.addCodeAttributeTypeId(response.data.id);
+                    completedCount++;
+
+                    if (completedCount === totalCount) {
+                        this.isLoading = false;
+                        this.successMessage = `All ${totalCount} attributes saved successfully!`;
+                        this.codeGeneratorService.completeStep(1);
+                        
+                        setTimeout(() => {
+                            this.router.navigate(['/code-type-main']);
+                        }, 1500);
+                    }
+                },
+                error: (error) => {
+                    this.isLoading = false;
+                    this.errorMessage = error.error?.message || `Failed to save attribute ${index + 1}. Please try again.`;
+                }
+            });
+        });
     }
+
+
 
     get nameAr() { return this.attributeForm.get('nameAr'); }
     get nameEn() { return this.attributeForm.get('nameEn'); }

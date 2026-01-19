@@ -18,8 +18,7 @@ export class CodeDetailsComponent implements OnInit {
     errorMessage = '';
     successMessage = '';
 
-    currentEntry = 0;
-    totalEntries = 3;
+    details: any[] = [];
     savedIds: number[] = [];
     savedCodes: string[] = [];
 
@@ -36,7 +35,7 @@ export class CodeDetailsComponent implements OnInit {
         const state = this.codeGeneratorService.getState();
         this.attributeMainIds = state.codeAttributeMainIds;
 
-        if (this.attributeMainIds.length !== 3) {
+        if (this.attributeMainIds.length === 0) {
             this.errorMessage = 'Missing required data. Please complete previous steps.';
             return;
         }
@@ -51,19 +50,75 @@ export class CodeDetailsComponent implements OnInit {
             nameEn: ['', [Validators.required]],
             descriptionAr: ['', [Validators.required]],
             descriptionEn: ['', [Validators.required]],
-            sortOrder: [this.currentEntry + 1, [Validators.required]]
+            sortOrder: [this.details.length + 1, [Validators.required]]
         });
     }
 
     onSubmit() {
-        if (this.detailForm.valid && !this.isLoading) {
-            this.isLoading = true;
-            this.errorMessage = '';
-            this.successMessage = '';
+        if (this.detailForm.valid) {
+            this.addDetail();
+        } else {
+            Object.keys(this.detailForm.controls).forEach(key => {
+                this.detailForm.get(key)?.markAsTouched();
+            });
+        }
+    }
 
+    addDetail() {
+        if (this.detailForm.valid) {
+            if (this.details.length >= this.attributeMainIds.length) {
+                this.errorMessage = `You can only add ${this.attributeMainIds.length} detail entries (one for each main entry).`;
+                return;
+            }
+
+            this.details.push({ ...this.detailForm.value });
+            this.successMessage = `Detail added! Total: ${this.details.length}`;
+            this.detailForm.reset();
+            this.detailForm.patchValue({ sortOrder: this.details.length + 1 });
+            this.errorMessage = '';
+            
+            setTimeout(() => {
+                this.successMessage = '';
+            }, 2000);
+        }
+    }
+
+    removeDetail(index: number) {
+        this.details.splice(index, 1);
+        // Update sort order for remaining items
+        this.details.forEach((detail, idx) => {
+            detail.sortOrder = idx + 1;
+        });
+        this.detailForm.patchValue({ sortOrder: this.details.length + 1 });
+        this.successMessage = `Detail removed! Total: ${this.details.length}`;
+        
+        setTimeout(() => {
+            this.successMessage = '';
+        }, 2000);
+    }
+
+    saveAllDetails() {
+        if (this.details.length === 0) {
+            this.errorMessage = 'Please add at least one detail entry before saving.';
+            return;
+        }
+
+        if (this.details.length !== this.attributeMainIds.length) {
+            this.errorMessage = `You must add exactly ${this.attributeMainIds.length} detail entries (one for each main entry).`;
+            return;
+        }
+
+        this.isLoading = true;
+        this.errorMessage = '';
+        this.successMessage = '';
+
+        let completedCount = 0;
+        const totalCount = this.details.length;
+
+        this.details.forEach((detail, index) => {
             const requestData = {
-                ...this.detailForm.value,
-                attributeMainId: this.attributeMainIds[this.currentEntry]
+                ...detail,
+                attributeMainId: this.attributeMainIds[index]
             };
 
             this.codeAttributeDetailService.createCodeAttributeDetail(requestData).subscribe({
@@ -71,32 +126,24 @@ export class CodeDetailsComponent implements OnInit {
                     this.savedIds.push(response.data.id);
                     this.savedCodes.push(response.data.code);
                     this.codeGeneratorService.addCodeAttributeDetailId(response.data.id);
+                    completedCount++;
 
-                    if (this.currentEntry < this.totalEntries - 1) {
-                        this.currentEntry++;
-                        this.successMessage = `Detail ${this.currentEntry}/${this.totalEntries} saved!`;
-                        this.detailForm.reset();
-                        this.detailForm.patchValue({ sortOrder: this.currentEntry + 1 });
+                    if (completedCount === totalCount) {
                         this.isLoading = false;
-                    } else {
-                        this.successMessage = 'All 3 details saved successfully!';
+                        this.successMessage = `All ${totalCount} details saved successfully!`;
                         this.codeGeneratorService.completeStep(3);
-
+                        
                         setTimeout(() => {
                             this.router.navigate(['/code-settings']);
-                        }, 1000);
+                        }, 1500);
                     }
                 },
                 error: (error) => {
                     this.isLoading = false;
-                    this.errorMessage = error.error?.message || 'Failed to create code attribute detail. Please try again.';
+                    this.errorMessage = error.error?.message || `Failed to save detail ${index + 1}. Please try again.`;
                 }
             });
-        } else {
-            Object.keys(this.detailForm.controls).forEach(key => {
-                this.detailForm.get(key)?.markAsTouched();
-            });
-        }
+        });
     }
 
     get code() { return this.detailForm.get('code'); }

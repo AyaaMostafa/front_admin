@@ -1,13 +1,13 @@
 <div class="code-type-main-container">
     <div class="header">
         <h2>Code Type Main</h2>
-        <p class="description">Configure main settings - Entry {{ currentEntry + 1 }} of {{ totalEntries }}</p>
+        <p class="description">Configure main settings - {{ mains.length }} of {{ codeAttributeTypeIds.length }} entries added</p>
     </div>
 
     <div class="content">
         <div class="card">
-            <h3>Main {{ currentEntry + 1 }} Configuration</h3>
-            <p>Enter details for main #{{ currentEntry + 1 }}</p>
+            <h3>Add New Main Entry</h3>
+            <p>Enter main details and click "Add Main" to add it to the list ({{ mains.length }}/{{ codeAttributeTypeIds.length }})</p>
 
             @if (successMessage) {
             <div class="alert alert-success">{{ successMessage }}</div>
@@ -15,12 +15,6 @@
 
             @if (errorMessage) {
             <div class="alert alert-error">{{ errorMessage }}</div>
-            }
-
-            @if (savedIds.length > 0) {
-            <div class="saved-info">
-                <strong>Saved:</strong> {{ savedIds.length }} of {{ totalEntries }} mains
-            </div>
             }
 
             <form [formGroup]="mainForm" (ngSubmit)="onSubmit()" class="form">
@@ -83,13 +77,70 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" [disabled]="isLoading">
-                        @if (isLoading) {
-                        <span class="spinner"></span>
-                        Saving...
-                        } @else if (currentEntry < totalEntries - 1) { Save & Next } @else { Save & Continue } </button>
+                    <button type="submit" class="btn btn-primary" [disabled]="isLoading || mains.length >= codeAttributeTypeIds.length">
+                        Add Main
+                    </button>
                 </div>
             </form>
         </div>
+
+        @if (mains.length > 0) {
+        <div class="card mains-list">
+            <h3>Added Main Entries ({{ mains.length }}/{{ codeAttributeTypeIds.length }})</h3>
+            <p>Review your main entries before saving</p>
+            
+            <div class="mains-table">
+                @for (main of mains; track $index) {
+                <div class="main-item">
+                    <div class="main-header">
+                        <h4>Main Entry #{{ $index + 1 }}</h4>
+                        <button type="button" class="btn btn-delete" (click)="removeMain($index)" [disabled]="isLoading">
+                            ✕ Remove
+                        </button>
+                    </div>
+                    <div class="main-details">
+                        <div class="detail-row">
+                            <div class="detail-item">
+                                <strong>Code:</strong>
+                                <span>{{ main.code }}</span>
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-item">
+                                <strong>Name (Arabic):</strong>
+                                <span dir="rtl">{{ main.nameAr }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Name (English):</strong>
+                                <span>{{ main.nameEn }}</span>
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-item">
+                                <strong>Description (Arabic):</strong>
+                                <span dir="rtl">{{ main.descriptionAr }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Description (English):</strong>
+                                <span>{{ main.descriptionEn }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+
+            <div class="save-all-actions">
+                <button type="button" class="btn btn-success" (click)="saveAllMains()" [disabled]="isLoading || mains.length !== codeAttributeTypeIds.length">
+                    @if (isLoading) {
+                    <span class="spinner"></span>
+                    Saving All Mains...
+                    } @else {
+                    Save All Mains & Continue
+                    }
+                </button>
+            </div>
+        </div>
+        }
     </div>
 </div>

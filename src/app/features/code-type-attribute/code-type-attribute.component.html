@@ -1,13 +1,13 @@
 <div class="code-type-attribute-container">
     <div class="header">
         <h2>Code Type Attribute</h2>
-        <p class="description">Define 3 attributes - Entry {{ currentEntry + 1 }} of {{ totalEntries }}</p>
+        <p class="description">Define attributes dynamically - {{ attributes.length }} attribute(s) added</p>
     </div>
 
     <div class="content">
         <div class="card">
-            <h3>Attribute {{ currentEntry + 1 }} Configuration</h3>
-            <p>Enter details for attributes #{{ currentEntry + 1 }}</p>
+            <h3>Add New Attribute</h3>
+            <p>Enter attribute details and click "Add Attribute" to add it to the list</p>
 
             @if (successMessage) {
             <div class="alert alert-success">{{ successMessage }}</div>
@@ -15,12 +15,6 @@
 
             @if (errorMessage) {
             <div class="alert alert-error">{{ errorMessage }}</div>
-            }
-
-            @if (savedIds.length > 0) {
-            <div class="saved-info">
-                <strong>Saved:</strong> {{ savedIds.length }} of {{ totalEntries }} attributes
-            </div>
             }
 
             <form [formGroup]="attributeForm" (ngSubmit)="onSubmit()" class="form">
@@ -67,12 +61,63 @@
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary" [disabled]="isLoading">
-                        @if (isLoading) {
-                        <span class="spinner"></span>
-                        Saving...
-                        } @else if (currentEntry < totalEntries - 1) { Save & Next } @else { Save & Continue } </button>
+                        Add Attribute
+                    </button>
                 </div>
             </form>
         </div>
+
+        @if (attributes.length > 0) {
+        <div class="card attributes-list">
+            <h3>Added Attributes ({{ attributes.length }})</h3>
+            <p>Review your attributes before saving</p>
+            
+            <div class="attributes-table">
+                @for (attribute of attributes; track $index) {
+                <div class="attribute-item">
+                    <div class="attribute-header">
+                        <h4>Attribute #{{ $index + 1 }}</h4>
+                        <button type="button" class="btn btn-delete" (click)="removeAttribute($index)" [disabled]="isLoading">
+                            ✕ Remove
+                        </button>
+                    </div>
+                    <div class="attribute-details">
+                        <div class="detail-row">
+                            <div class="detail-item">
+                                <strong>Name (Arabic):</strong>
+                                <span dir="rtl">{{ attribute.nameAr }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Name (English):</strong>
+                                <span>{{ attribute.nameEn }}</span>
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-item">
+                                <strong>Description (Arabic):</strong>
+                                <span dir="rtl">{{ attribute.descriptionAr }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Description (English):</strong>
+                                <span>{{ attribute.descriptionEn }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+
+            <div class="save-all-actions">
+                <button type="button" class="btn btn-success" (click)="saveAllAttributes()" [disabled]="isLoading">
+                    @if (isLoading) {
+                    <span class="spinner"></span>
+                    Saving All Attributes...
+                    } @else {
+                    Save All Attributes & Continue
+                    }
+                </button>
+            </div>
+        </div>
+        }
     </div>
 </div>
