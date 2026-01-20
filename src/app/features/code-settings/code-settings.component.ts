@@ -29,8 +29,8 @@ interface SettingDisplay {
 export class CodeSettingsComponent implements OnInit {
     settings: SettingDisplay[] = [];
     savedSettingIds: number[] = [];
-    
 
+ 
     isLoading = false;
     errorMessage = '';
     successMessage = '';
