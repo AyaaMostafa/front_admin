@@ -17,7 +17,6 @@ export class DashboardComponent implements OnInit {
         'Code Type',
         'Code Type Attribute',
         'Code Type Main',
-        'Code Details',
         'Code Settings',
         'Code Sequence',
         'Code Generator'
@@ -27,7 +26,6 @@ export class DashboardComponent implements OnInit {
         '/code-type',
         '/code-type-attribute',
         '/code-type-main',
-        '/code-details',
         '/code-settings',
         '/code-sequence',
         '/code-generation'
