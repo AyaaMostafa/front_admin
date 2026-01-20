@@ -1,17 +1,11 @@
-<app-header (toggleSidebar)="toggleSidebar()"></app-header>
-<div class="layout">
-    <aside class="layout-sidebar" [class.collapsed]="isSidebarCollapsed">
-        <app-sidebar [isCollapsed]="isSidebarCollapsed"></app-sidebar>
-    </aside>
-    <main class="layout-main">
-        <div class="code-generation-container">
-            <div class="header">
-                <h2>Code Generation</h2>
-                <p class="description">Generate your final code based on configurations</p>
-            </div>
+<div class="code-generation-container">
+    <div class="header">
+        <h2>Code Generation</h2>
+        <p class="description">Generate your final code based on configurations</p>
+    </div>
 
-            <div class="content">
-                <!-- Generated Code Reveal (shown after generation) -->
+    <div class="content">
+        <!-- Generated Code Reveal (shown after generation) -->
                 @if (showCodeReveal) {
                 <div class="code-reveal-card">
                     <div class="celebration-icon">🎉</div>
@@ -136,7 +130,4 @@
                     </form>
                 </div>
             </div>
-        </div>
-    </main>
 </div>
-<app-footer></app-footer>
