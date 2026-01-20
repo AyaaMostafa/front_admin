@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CodeAttributeMainService } from '../../core/services/code-attribute-main.service';
+import { CodeAttributeDetailService } from '../../core/services/code-attribute-detail.service';
 import { CodeGeneratorService } from '../../core/services/code-generator.service';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
@@ -17,21 +18,26 @@ import { SidebarComponent } from '../../shared/components/sidebar/sidebar.compon
 })
 export class CodeTypeMainComponent implements OnInit {
     mainForm!: FormGroup;
+    mains: any[] = [];
+    savedMainIds: number[] = [];
+
+    detailForm!: FormGroup;
+    details: any[] = [];
+    savedDetailIds: number[] = [];
+
     isLoading = false;
     errorMessage = '';
     successMessage = '';
-
-    mains: any[] = [];
-    savedIds: number[] = [];
-
     codeTypeId!: number;
     codeAttributeTypeIds: number[] = [];
-
     isSidebarCollapsed = false;
+
+    mainsSaved = false;
 
     constructor(
         private fb: FormBuilder,
         private codeAttributeMainService: CodeAttributeMainService,
+        private codeAttributeDetailService: CodeAttributeDetailService,
         private codeGeneratorService: CodeGeneratorService,
         private router: Router
     ) { }
@@ -46,10 +52,10 @@ export class CodeTypeMainComponent implements OnInit {
             return;
         }
 
-        this.initForm();
+        this.initForms();
     }
 
-    initForm() {
+    initForms() {
         this.mainForm = this.fb.group({
             code: ['', [Validators.required, Validators.minLength(2)]],
             nameAr: ['', [Validators.required]],
@@ -57,9 +63,18 @@ export class CodeTypeMainComponent implements OnInit {
             descriptionAr: ['', [Validators.required]],
             descriptionEn: ['', [Validators.required]]
         });
+
+        this.detailForm = this.fb.group({
+            code: ['', [Validators.required, Validators.minLength(2)]],
+            nameAr: ['', [Validators.required]],
+            nameEn: ['', [Validators.required]],
+            descriptionAr: ['', [Validators.required]],
+            descriptionEn: ['', [Validators.required]],
+            sortOrder: [this.details.length + 1, [Validators.required]]
+        });
     }
 
-    onSubmit() {
+    onSubmitMain() {
         if (this.mainForm.valid) {
             this.addMain();
         } else {
@@ -80,7 +95,7 @@ export class CodeTypeMainComponent implements OnInit {
             this.successMessage = `Main added! Total: ${this.mains.length}`;
             this.mainForm.reset();
             this.errorMessage = '';
-            
+
             setTimeout(() => {
                 this.successMessage = '';
             }, 2000);
@@ -90,7 +105,7 @@ export class CodeTypeMainComponent implements OnInit {
     removeMain(index: number) {
         this.mains.splice(index, 1);
         this.successMessage = `Main removed! Total: ${this.mains.length}`;
-        
+
         setTimeout(() => {
             this.successMessage = '';
         }, 2000);
@@ -123,18 +138,18 @@ export class CodeTypeMainComponent implements OnInit {
 
             this.codeAttributeMainService.createCodeAttributeMain(requestData).subscribe({
                 next: (response) => {
-                    this.savedIds.push(response.data.id);
+                    this.savedMainIds.push(response.data.id);
                     this.codeGeneratorService.addCodeAttributeMainId(response.data.id);
                     completedCount++;
 
                     if (completedCount === totalCount) {
                         this.isLoading = false;
-                        this.successMessage = `All ${totalCount} mains saved successfully!`;
-                        this.codeGeneratorService.completeStep(2);
-                        
+                        this.successMessage = `All ${totalCount} mains saved successfully! Now you can add details below.`;
+                        this.mainsSaved = true;
+
                         setTimeout(() => {
-                            this.router.navigate(['/code-details']);
-                        }, 1500);
+                            document.getElementById('details-section')?.scrollIntoView({ behavior: 'smooth' });
+                        }, 1000);
                     }
                 },
                 error: (error) => {
@@ -145,13 +160,110 @@ export class CodeTypeMainComponent implements OnInit {
         });
     }
 
+    onSubmitDetail() {
+        if (this.detailForm.valid) {
+            this.addDetail();
+        } else {
+            Object.keys(this.detailForm.controls).forEach(key => {
+                this.detailForm.get(key)?.markAsTouched();
+            });
+        }
+    }
+
+    addDetail() {
+        if (this.detailForm.valid) {
+            if (this.details.length >= this.savedMainIds.length) {
+                this.errorMessage = `You can only add ${this.savedMainIds.length} detail entries (one for each main entry).`;
+                return;
+            }
+
+            this.details.push({ ...this.detailForm.value });
+            this.successMessage = `Detail added! Total: ${this.details.length}`;
+            this.detailForm.reset();
+            this.detailForm.patchValue({ sortOrder: this.details.length + 1 });
+            this.errorMessage = '';
+
+            setTimeout(() => {
+                this.successMessage = '';
+            }, 2000);
+        }
+    }
+
+    removeDetail(index: number) {
+        this.details.splice(index, 1);
+        this.details.forEach((detail, idx) => {
+            detail.sortOrder = idx + 1;
+        });
+        this.detailForm.patchValue({ sortOrder: this.details.length + 1 });
+        this.successMessage = `Detail removed! Total: ${this.details.length}`;
+
+        setTimeout(() => {
+            this.successMessage = '';
+        }, 2000);
+    }
+
+    saveAllDetails() {
+        if (this.details.length === 0) {
+            this.errorMessage = 'Please add at least one detail entry before saving.';
+            return;
+        }
+
+        if (this.details.length !== this.savedMainIds.length) {
+            this.errorMessage = `You must add exactly ${this.savedMainIds.length} detail entries (one for each main entry).`;
+            return;
+        }
+
+        this.isLoading = true;
+        this.errorMessage = '';
+        this.successMessage = '';
+
+        let completedCount = 0;
+        const totalCount = this.details.length;
+
+        this.details.forEach((detail, index) => {
+            const requestData = {
+                ...detail,
+                attributeMainId: this.savedMainIds[index]
+            };
+
+            this.codeAttributeDetailService.createCodeAttributeDetail(requestData).subscribe({
+                next: (response) => {
+                    this.savedDetailIds.push(response.data.id);
+                    this.codeGeneratorService.addCodeAttributeDetailId(response.data.id);
+                    completedCount++;
+
+                    if (completedCount === totalCount) {
+                        this.isLoading = false;
+                        this.successMessage = `All ${totalCount} details saved successfully!`;
+                        this.codeGeneratorService.completeStep(2);
+
+                        setTimeout(() => {
+                            this.router.navigate(['/code-settings']);
+                        }, 1500);
+                    }
+                },
+                error: (error) => {
+                    this.isLoading = false;
+                    this.errorMessage = error.error?.message || `Failed to save detail ${index + 1}. Please try again.`;
+                }
+            });
+        });
+    }
+
     toggleSidebar(): void {
         this.isSidebarCollapsed = !this.isSidebarCollapsed;
     }
 
-    get code() { return this.mainForm.get('code'); }
-    get nameAr() { return this.mainForm.get('nameAr'); }
-    get nameEn() { return this.mainForm.get('nameEn'); }
-    get descriptionAr() { return this.mainForm.get('descriptionAr'); }
-    get descriptionEn() { return this.mainForm.get('descriptionEn'); }
+    get mainCode() { return this.mainForm.get('code'); }
+    get mainNameAr() { return this.mainForm.get('nameAr'); }
+    get mainNameEn() { return this.mainForm.get('nameEn'); }
+    get mainDescriptionAr() { return this.mainForm.get('descriptionAr'); }
+    get mainDescriptionEn() { return this.mainForm.get('descriptionEn'); }
+
+    get detailCode() { return this.detailForm.get('code'); }
+    get detailNameAr() { return this.detailForm.get('nameAr'); }
+    get detailNameEn() { return this.detailForm.get('nameEn'); }
+    get detailDescriptionAr() { return this.detailForm.get('descriptionAr'); }
+    get detailDescriptionEn() { return this.detailForm.get('descriptionEn'); }
+    get sortOrder() { return this.detailForm.get('sortOrder'); }
 }
