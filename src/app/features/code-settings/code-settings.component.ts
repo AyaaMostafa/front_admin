@@ -4,9 +4,6 @@ import { Router } from '@angular/router';
 import { CodeTypeSettingService } from '../../core/services/code-type-setting.service';
 import { CodeGeneratorService } from '../../core/services/code-generator.service';
 import { forkJoin } from 'rxjs';
-import { HeaderComponent } from '../../shared/components/header/header.component';
-import { FooterComponent } from '../../shared/components/footer/footer.component';
-import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 
 interface SettingDisplay {
     id?: number;
@@ -19,7 +16,7 @@ interface SettingDisplay {
 @Component({
     selector: 'app-code-settings',
     standalone: true,
-    imports: [CommonModule, HeaderComponent, SidebarComponent, FooterComponent],
+    imports: [CommonModule],
     templateUrl: './code-settings.component.html',
     styleUrl: './code-settings.component.css'
 })

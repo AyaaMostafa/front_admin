@@ -3,14 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CodeGenerationService } from '../../core/services/code-generation.service';
 import { CodeGeneratorService } from '../../core/services/code-generator.service';
-import { HeaderComponent } from '../../shared/components/header/header.component';
-import { FooterComponent } from '../../shared/components/footer/footer.component';
-import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 
 @Component({
     selector: 'app-code-generation',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, HeaderComponent, SidebarComponent, FooterComponent],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule],
     templateUrl: './code-generation.component.html',
     styleUrl: './code-generation.component.css'
 })

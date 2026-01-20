@@ -5,14 +5,11 @@ import { Router } from '@angular/router';
 import { CodeAttributeMainService } from '../../core/services/code-attribute-main.service';
 import { CodeAttributeDetailService } from '../../core/services/code-attribute-detail.service';
 import { CodeGeneratorService } from '../../core/services/code-generator.service';
-import { HeaderComponent } from '../../shared/components/header/header.component';
-import { FooterComponent } from '../../shared/components/footer/footer.component';
-import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 
 @Component({
     selector: 'app-code-type-main',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, HeaderComponent, SidebarComponent, FooterComponent],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule],
     templateUrl: './code-type-main.component.html',
     styleUrl: './code-type-main.component.css'
 })

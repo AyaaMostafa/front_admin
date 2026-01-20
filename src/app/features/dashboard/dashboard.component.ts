@@ -1,21 +1,16 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { HeaderComponent } from '../../shared/components/header/header.component';
-import { FooterComponent } from '../../shared/components/footer/footer.component';
-import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { CodeGeneratorService } from '../../core/services/code-generator.service';
 
 @Component({
     selector: 'app-dashboard',
     standalone: true,
-    imports: [CommonModule, HeaderComponent, SidebarComponent, FooterComponent],
+    imports: [CommonModule],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements OnInit {
-    isSidebarCollapsed = false;
-
     cardNames = [
         'Code Type',
         'Code Type Attribute',
@@ -47,10 +42,6 @@ export class DashboardComponent implements OnInit {
         // Initialize completed state from service
         const state = this.codeGeneratorService.getState();
         this.completed.set(state.completedSteps);
-    }
-
-    toggleSidebar(): void {
-        this.isSidebarCollapsed = !this.isSidebarCollapsed;
     }
 
     canAccess(index: number): boolean {
