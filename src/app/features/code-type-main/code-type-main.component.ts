@@ -7,11 +7,12 @@ import { CodeAttributeDetailService } from '../../core/services/code-attribute-d
 import { CodeGeneratorService } from '../../core/services/code-generator.service';
 import { CodeTypeService } from '../../core/services/code-type.service';
 import { CodeAttributeTypeService } from '../../core/services/code-attribute-type.service';
+import { AlertComponent } from '../../shared/components/alert/alert.component';
 
 @Component({
     selector: 'app-code-type-main',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, AlertComponent],
     templateUrl: './code-type-main.component.html',
     styleUrl: './code-type-main.component.css'
 })

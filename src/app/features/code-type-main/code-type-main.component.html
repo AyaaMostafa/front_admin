@@ -19,7 +19,13 @@
                 <h3>Add New Main Entry</h3>
                 <p>Enter main details and click "Add Main" to add it to the list</p>
 
+                @if (successMessage) {
+                <div class="alert alert-success">{{ successMessage }}</div>
+                }
 
+                @if (errorMessage) {
+                <div class="alert alert-error">{{ errorMessage }}</div>
+                }
 
                 <form [formGroup]="mainForm" (ngSubmit)="onSubmitMain()" class="form">
                     <div class="form-row">
