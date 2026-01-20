@@ -22,13 +22,14 @@ interface SettingDisplay {
 @Component({
     selector: 'app-code-settings',
     standalone: true,
-    imports: [CommonModule, AlertComponent],
+    imports: [CommonModule, AlertComponent,FormsModule],
     templateUrl: './code-settings.component.html',
     styleUrl: './code-settings.component.css'
 })
 export class CodeSettingsComponent implements OnInit {
     settings: SettingDisplay[] = [];
     savedSettingIds: number[] = [];
+    
 
     isLoading = false;
     errorMessage = '';
