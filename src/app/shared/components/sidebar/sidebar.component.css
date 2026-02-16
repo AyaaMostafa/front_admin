@@ -216,19 +216,6 @@
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
-}
-
-.sub-item:hover {
-    background: #f9fafb;
-    color: #111827;
-}
-
-.sub-item.active {
-    background: rgba(43, 182, 115, 0.08);
-    color: #2bb673;
-    font-weight: 600;
-}
-    transition: all 0.2s;
     margin-bottom: 0.125rem;
 }
 
