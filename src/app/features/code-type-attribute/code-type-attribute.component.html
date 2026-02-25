@@ -1,119 +1,144 @@
-<div class="code-type-attribute-container">
-    <div class="header">
-        <h2>Code Type Attribute</h2>
-        <p class="description">Define attributes dynamically - {{ attributes.length }} attribute(s) added</p>
+<div class="code-type-attribute-container panel-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h2 class="main-content-title tx-24 mg-b-5">Code Type Attribute</h2>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Settings</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Code Type Attribute</li>
+            </ol>
+        </div>
     </div>
 
-    <div class="content">
-        <div class="card">
-            <h3>Add New Attribute</h3>
-            <p>Enter attribute details and click "Add Attribute" to add it to the list</p>
+    <div class="content row row-sm">
+        <div class="col-lg-12 col-md-12">
+            <!-- Add New Attribute Card -->
+            <div class="card custom-card">
+                <div class="card-body">
+                    <h3 class="card-title">Add New Attribute</h3>
+                    <p class="card-description">Enter attribute details and click "Add Attribute" to add it to the list
+                        ({{ attributes.length }} currently added)</p>
 
-            <app-alert *ngIf="successMessage" type="success" [message]="successMessage"></app-alert>
-            <app-alert *ngIf="errorMessage" type="error" [message]="errorMessage"></app-alert>
+                    <app-alert *ngIf="successMessage" type="success" [message]="successMessage"></app-alert>
+                    <app-alert *ngIf="errorMessage" type="error" [message]="errorMessage"></app-alert>
 
-            <form [formGroup]="attributeForm" (ngSubmit)="onSubmit()" class="form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="nameAr">Name (Arabic) <span class="required">*</span></label>
-                        <input id="nameAr" type="text" formControlName="nameAr" placeholder="الاسم بالعربية" dir="rtl"
-                            [class.invalid]="nameAr?.invalid && nameAr?.touched" />
-                        @if (nameAr?.invalid && nameAr?.touched) {
-                        <span class="error-text">Arabic name is required</span>
-                        }
-                    </div>
+                    <form [formGroup]="attributeForm" (ngSubmit)="onSubmit()" class="needs-validation" novalidate>
+                        <div class="row">
+                            <!-- Name Arabic -->
+                            <div class="col-md-6 mb-3">
+                                <label for="nameAr" class="form-label">Name (Arabic) <span
+                                        class="text-danger">*</span></label>
+                                <input id="nameAr" type="text" class="form-control" formControlName="nameAr"
+                                    placeholder="الاسم بالعربية" dir="rtl"
+                                    [class.is-invalid]="nameAr?.invalid && nameAr?.touched" />
+                                <div class="error-text" *ngIf="nameAr?.invalid && nameAr?.touched">
+                                    Arabic name is required
+                                </div>
+                            </div>
 
-                    <div class="form-group">
-                        <label for="nameEn">Name (English) <span class="required">*</span></label>
-                        <input id="nameEn" type="text" formControlName="nameEn" placeholder="English Name"
-                            [class.invalid]="nameEn?.invalid && nameEn?.touched" />
-                        @if (nameEn?.invalid && nameEn?.touched) {
-                        <span class="error-text">English name is required</span>
-                        }
-                    </div>
+                            <!-- Name English -->
+                            <div class="col-md-6 mb-3">
+                                <label for="nameEn" class="form-label">Name (English) <span
+                                        class="text-danger">*</span></label>
+                                <input id="nameEn" type="text" class="form-control" formControlName="nameEn"
+                                    placeholder="English Name"
+                                    [class.is-invalid]="nameEn?.invalid && nameEn?.touched" />
+                                <div class="error-text" *ngIf="nameEn?.invalid && nameEn?.touched">
+                                    English name is required
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Description Arabic -->
+                            <div class="col-md-6 mb-3">
+                                <label for="descriptionAr" class="form-label">Description (Arabic) <span
+                                        class="text-danger">*</span></label>
+                                <textarea id="descriptionAr" class="form-control" formControlName="descriptionAr"
+                                    placeholder="الوصف بالعربية" dir="rtl" rows="3"
+                                    [class.is-invalid]="descriptionAr?.invalid && descriptionAr?.touched"></textarea>
+                                <div class="error-text" *ngIf="descriptionAr?.invalid && descriptionAr?.touched">
+                                    Arabic description is required
+                                </div>
+                            </div>
+
+                            <!-- Description English -->
+                            <div class="col-md-6 mb-3">
+                                <label for="descriptionEn" class="form-label">Description (English) <span
+                                        class="text-danger">*</span></label>
+                                <textarea id="descriptionEn" class="form-control" formControlName="descriptionEn"
+                                    placeholder="English Description" rows="3"
+                                    [class.is-invalid]="descriptionEn?.invalid && descriptionEn?.touched"></textarea>
+                                <div class="error-text" *ngIf="descriptionEn?.invalid && descriptionEn?.touched">
+                                    English description is required
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="submit" class="btn btn-primary-save" [disabled]="isLoading">
+                                Add Attribute
+                            </button>
+                        </div>
+                    </form>
                 </div>
+            </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="descriptionAr">Description (Arabic) <span class="required">*</span></label>
-                        <textarea id="descriptionAr" formControlName="descriptionAr" placeholder="الوصف بالعربية"
-                            dir="rtl" rows="4"
-                            [class.invalid]="descriptionAr?.invalid && descriptionAr?.touched"></textarea>
-                        @if (descriptionAr?.invalid && descriptionAr?.touched) {
-                        <span class="error-text">Arabic description is required</span>
+            <!-- Added Attributes List Card -->
+            <div class="card custom-card attributes-list-card" *ngIf="attributes.length > 0">
+                <div class="card-body">
+                    <h3 class="card-title">Added Attributes ({{ attributes.length }})</h3>
+                    <p class="card-description">Review your attributes before saving</p>
+
+                    <div class="attributes-items-container">
+                        @for (attribute of attributes; track $index) {
+                        <div class="attribute-item">
+                            <div class="attribute-header">
+                                <h4>Attribute #{{ $index + 1 }}</h4>
+                                <button type="button" class="btn btn-danger-delete" (click)="removeAttribute($index)"
+                                    [disabled]="isLoading">
+                                    <i class="fa fa-trash me-1"></i> Remove
+                                </button>
+                            </div>
+                            <div class="attribute-details">
+                                <div class="detail-row">
+                                    <div class="detail-item">
+                                        <strong>Name (Arabic)</strong>
+                                        <span dir="rtl">{{ attribute.nameAr }}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Name (English)</strong>
+                                        <span>{{ attribute.nameEn }}</span>
+                                    </div>
+                                </div>
+                                <div class="detail-row mt-3">
+                                    <div class="detail-item">
+                                        <strong>Description (Arabic)</strong>
+                                        <span dir="rtl">{{ attribute.descriptionAr }}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Description (English)</strong>
+                                        <span>{{ attribute.descriptionEn }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         }
                     </div>
 
-                    <div class="form-group">
-                        <label for="descriptionEn">Description (English) <span class="required">*</span></label>
-                        <textarea id="descriptionEn" formControlName="descriptionEn" placeholder="English Description"
-                            rows="4" [class.invalid]="descriptionEn?.invalid && descriptionEn?.touched"></textarea>
-                        @if (descriptionEn?.invalid && descriptionEn?.touched) {
-                        <span class="error-text">English description is required</span>
-                        }
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" [disabled]="isLoading">
-                        Add Attribute
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        @if (attributes.length > 0) {
-        <div class="card attributes-list">
-            <h3>Added Attributes ({{ attributes.length }})</h3>
-            <p>Review your attributes before saving</p>
-
-            <div class="attributes-table">
-                @for (attribute of attributes; track $index) {
-                <div class="attribute-item">
-                    <div class="attribute-header">
-                        <h4>Attribute #{{ $index + 1 }}</h4>
-                        <button type="button" class="btn btn-delete" (click)="removeAttribute($index)"
+                    <div class="d-flex justify-content-center mt-4">
+                        <button type="button" class="btn btn-primary-save btn-lg px-5" (click)="saveAllAttributes()"
                             [disabled]="isLoading">
-                            ✕ Remove
+                            @if (isLoading) {
+                            <span class="spinner-border spinner-border-sm me-1"></span>
+                            Saving All Attributes...
+                            } @else {
+                            Save All Attributes & Continue
+                            }
                         </button>
                     </div>
-                    <div class="attribute-details">
-                        <div class="detail-row">
-                            <div class="detail-item">
-                                <strong>Name (Arabic):</strong>
-                                <span dir="rtl">{{ attribute.nameAr }}</span>
-                            </div>
-                            <div class="detail-item">
-                                <strong>Name (English):</strong>
-                                <span>{{ attribute.nameEn }}</span>
-                            </div>
-                        </div>
-                        <div class="detail-row">
-                            <div class="detail-item">
-                                <strong>Description (Arabic):</strong>
-                                <span dir="rtl">{{ attribute.descriptionAr }}</span>
-                            </div>
-                            <div class="detail-item">
-                                <strong>Description (English):</strong>
-                                <span>{{ attribute.descriptionEn }}</span>
-                            </div>
-                        </div>
-                    </div>
                 </div>
-                }
-            </div>
-
-            <div class="save-all-actions">
-                <button type="button" class="btn btn-success" (click)="saveAllAttributes()" [disabled]="isLoading">
-                    @if (isLoading) {
-                    <span class="spinner"></span>
-                    Saving All Attributes...
-                    } @else {
-                    Save All Attributes & Continue
-                    }
-                </button>
             </div>
         </div>
-        }
     </div>
 </div>

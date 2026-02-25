@@ -65,6 +65,10 @@ export class CodeTypeComponent implements OnInit {
         }
     }
 
+    onCancel() {
+        this.router.navigate(['/dashboard']);
+    }
+
     get codeTypeCode() { return this.codeTypeForm.get('codeTypeCode'); }
     get nameAr() { return this.codeTypeForm.get('nameAr'); }
     get nameEn() { return this.codeTypeForm.get('nameEn'); }

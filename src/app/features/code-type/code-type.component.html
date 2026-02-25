@@ -1,87 +1,107 @@
-<div class="code-type-container">
-    <div class="header">
-        <h2>Code Type</h2>
-        <p class="description">Define and manage your code types</p>
+<div class="code-type-container panel-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h2 class="main-content-title tx-24 mg-b-5">Code Type Configuration</h2>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Settings</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Code Type</li>
+            </ol>
+        </div>
     </div>
 
-    <div class="content">
-        <div class="card">
-            <h3>Code Type Configuration</h3>
-            <p>Enter the details for your code type below.</p>
+    <div class="content row row-sm">
+        <div class="col-lg-12 col-md-12">
+            <div class="card custom-card">
+                <div class="card-body">
+                    <app-alert *ngIf="successMessage" type="success" [message]="successMessage"></app-alert>
+                    <app-alert *ngIf="errorMessage" type="error" [message]="errorMessage"></app-alert>
 
-            <app-alert *ngIf="successMessage" type="success" [message]="successMessage"></app-alert>
-            <app-alert *ngIf="errorMessage" type="error" [message]="errorMessage"></app-alert>
+                    <form [formGroup]="codeTypeForm" (ngSubmit)="onSubmit()" class="needs-validation" novalidate>
+                        <div class="row">
+                            <!-- Code Type Code -->
+                            <div class="col-md-6 mb-3">
+                                <label for="codeTypeCode" class="form-label">Code Type Code <span
+                                        class="text-danger">*</span></label>
+                                <input id="codeTypeCode" type="text" class="form-control" formControlName="codeTypeCode"
+                                    placeholder="e.g., HIS"
+                                    [class.is-invalid]="codeTypeCode?.invalid && codeTypeCode?.touched" />
+                                <div class="invalid-feedback" *ngIf="codeTypeCode?.invalid && codeTypeCode?.touched">
+                                    @if (codeTypeCode?.errors?.['required']) {
+                                    Code Type Code is required
+                                    } @else if (codeTypeCode?.errors?.['minlength']) {
+                                    Code must be at least 1 character
+                                    }
+                                </div>
+                            </div>
+                        </div>
 
-            <form [formGroup]="codeTypeForm" (ngSubmit)="onSubmit()" class="form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="codeTypeCode">Code Type Code <span class="required">*</span></label>
-                        <input id="codeTypeCode" type="text" formControlName="codeTypeCode" placeholder="e.g., HIS"
-                            [class.invalid]="codeTypeCode?.invalid && codeTypeCode?.touched" />
-                        @if (codeTypeCode?.invalid && codeTypeCode?.touched) {
-                        <span class="error-text">
-                            @if (codeTypeCode?.errors?.['required']) {
-                            Code Type Code is required
-                            } @else if (codeTypeCode?.errors?.['minlength']) {
-                            Code must be at least 1 character
-                            }
-                        </span>
-                        }
-                    </div>
+                        <div class="row">
+                            <!-- Name English -->
+                            <div class="col-md-6 mb-3">
+                                <label for="nameEn" class="form-label">Name (En) <span
+                                        class="text-danger">*</span></label>
+                                <input id="nameEn" type="text" class="form-control" formControlName="nameEn"
+                                    placeholder="Enter English Name"
+                                    [class.is-invalid]="nameEn?.invalid && nameEn?.touched" />
+                                <div class="invalid-feedback" *ngIf="nameEn?.invalid && nameEn?.touched">
+                                    English name is required
+                                </div>
+                            </div>
+
+                            <!-- Name Arabic -->
+                            <div class="col-md-6 mb-3">
+                                <label for="nameAr" class="form-label">Name (Ar) <span
+                                        class="text-danger">*</span></label>
+                                <input id="nameAr" type="text" class="form-control" formControlName="nameAr"
+                                    placeholder="Enter Arabic Name"
+                                    [class.is-invalid]="nameAr?.invalid && nameAr?.touched" />
+                                <div class="invalid-feedback" *ngIf="nameAr?.invalid && nameAr?.touched">
+                                    Arabic name is required
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Description English -->
+                            <div class="col-md-12 mb-3">
+                                <label for="descriptionEn" class="form-label">Description (En)</label>
+                                <textarea id="descriptionEn" class="form-control" formControlName="descriptionEn"
+                                    placeholder="Enter English Description" rows="3"
+                                    [class.is-invalid]="descriptionEn?.invalid && descriptionEn?.touched"></textarea>
+                                <div class="invalid-feedback" *ngIf="descriptionEn?.invalid && descriptionEn?.touched">
+                                    English description is required
+                                </div>
+                            </div>
+
+                            <!-- Description Arabic -->
+                            <div class="col-md-12 mb-3">
+                                <label for="descriptionAr" class="form-label">Description (Ar)</label>
+                                <textarea id="descriptionAr" class="form-control" formControlName="descriptionAr"
+                                    placeholder="Enter Arabic Description" dir="rtl" rows="3"
+                                    [class.is-invalid]="descriptionAr?.invalid && descriptionAr?.touched"></textarea>
+                                <div class="invalid-feedback" *ngIf="descriptionAr?.invalid && descriptionAr?.touched">
+                                    Arabic description is required
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="button" class="btn btn-secondary-cancel me-2"
+                                (click)="onCancel()">Cancel</button>
+                            <button type="submit" class="btn btn-primary-save" [disabled]="isLoading">
+                                @if (isLoading) {
+                                <span class="spinner-border spinner-border-sm me-1"></span>
+                                Saving...
+                                } @else {
+                                Save
+                                }
+                            </button>
+                        </div>
+                    </form>
                 </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="nameAr">Name (Arabic) <span class="required">*</span></label>
-                        <input id="nameAr" type="text" formControlName="nameAr" placeholder="الاسم بالعربية" dir="rtl"
-                            [class.invalid]="nameAr?.invalid && nameAr?.touched" />
-                        @if (nameAr?.invalid && nameAr?.touched) {
-                        <span class="error-text">Arabic name is required</span>
-                        }
-                    </div>
-
-                    <div class="form-group">
-                        <label for="nameEn">Name (English) <span class="required">*</span></label>
-                        <input id="nameEn" type="text" formControlName="nameEn" placeholder="English Name"
-                            [class.invalid]="nameEn?.invalid && nameEn?.touched" />
-                        @if (nameEn?.invalid && nameEn?.touched) {
-                        <span class="error-text">English name is required</span>
-                        }
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="descriptionAr">Description (Arabic) <span class="required">*</span></label>
-                        <textarea id="descriptionAr" formControlName="descriptionAr" placeholder="الوصف بالعربية"
-                            dir="rtl" rows="4"
-                            [class.invalid]="descriptionAr?.invalid && descriptionAr?.touched"></textarea>
-                        @if (descriptionAr?.invalid && descriptionAr?.touched) {
-                        <span class="error-text">Arabic description is required</span>
-                        }
-                    </div>
-
-                    <div class="form-group">
-                        <label for="descriptionEn">Description (English) <span class="required">*</span></label>
-                        <textarea id="descriptionEn" formControlName="descriptionEn" placeholder="English Description"
-                            rows="4" [class.invalid]="descriptionEn?.invalid && descriptionEn?.touched"></textarea>
-                        @if (descriptionEn?.invalid && descriptionEn?.touched) {
-                        <span class="error-text">English description is required</span>
-                        }
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" [disabled]="isLoading">
-                        @if (isLoading) {
-                        <span class="spinner"></span>
-                        Saving...
-                        } @else {
-                        Save & Continue
-                        }
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
