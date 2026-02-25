@@ -28,7 +28,7 @@ export class CodeTypeComponent implements OnInit {
 
     ngOnInit() {
         this.codeTypeForm = this.fb.group({
-            codeTypeCode: ['', [Validators.required, Validators.minLength(2)]],
+            codeTypeCode: ['', [Validators.required, Validators.minLength(1)]],
             nameAr: ['', [Validators.required]],
             nameEn: ['', [Validators.required]],
             descriptionAr: ['', [Validators.required]],

@@ -16,7 +16,8 @@
 
     font-size: 2.5rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #44CDB8;
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 0.5rem;
@@ -59,7 +60,7 @@
     justify-content: center;
     width: 40px;
     height: 40px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #44CDB8;
     color: white;
     border-radius: 50%;
     font-weight: 700;
@@ -208,8 +209,8 @@ input:focus,
 textarea:focus,
 select:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #44CDB8;
+    box-shadow: 0 0 0 3px rgba(68, 205, 184, 0.1);
 }
 
 input.invalid,
@@ -264,7 +265,7 @@ textarea {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #44CDB8;
     color: white;
 }
 
@@ -326,7 +327,7 @@ textarea {
 }
 
 .main-header h4 {
-    color: #667eea;
+    color: #44CDB8;
     font-size: 1.125rem;
     font-weight: 600;
     margin: 0;
@@ -387,7 +388,7 @@ textarea {
 }
 
 .btn-success {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: #44CDB8;
     color: white;
     padding: 1rem 3rem;
     font-size: 1.125rem;
@@ -436,7 +437,7 @@ textarea {
 }
 
 .detail-header h4 {
-    color: #667eea;
+    color: #44CDB8;
     font-size: 1.125rem;
     font-weight: 600;
     margin: 0;

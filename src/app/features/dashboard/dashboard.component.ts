@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CodeGeneratorService } from '../../core/services/code-generator.service';
@@ -32,6 +32,7 @@ export class DashboardComponent implements OnInit {
     ];
 
     completed = signal<boolean[]>([]);
+    completedCount = computed(() => this.completed().filter(Boolean).length);
     activeCard: number | null = null;
     errorMessage = '';
 

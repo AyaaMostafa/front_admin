@@ -66,13 +66,14 @@
         <div class="card attributes-list">
             <h3>Added Attributes ({{ attributes.length }})</h3>
             <p>Review your attributes before saving</p>
-            
+
             <div class="attributes-table">
                 @for (attribute of attributes; track $index) {
                 <div class="attribute-item">
                     <div class="attribute-header">
                         <h4>Attribute #{{ $index + 1 }}</h4>
-                        <button type="button" class="btn btn-delete" (click)="removeAttribute($index)" [disabled]="isLoading">
+                        <button type="button" class="btn btn-delete" (click)="removeAttribute($index)"
+                            [disabled]="isLoading">
                             ✕ Remove
                         </button>
                     </div>

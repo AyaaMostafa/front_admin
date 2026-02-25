@@ -1,14 +1,14 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '../../core/services';
 import { ROUTES } from '../../core/constants';
 
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule],
     templateUrl: './login.component.html',
     styleUrl: './login.component.css'
 })
@@ -16,6 +16,11 @@ export class LoginComponent {
     loginForm: FormGroup;
     isLoading = signal(false);
     errorMessage = signal<string | null>(null);
+    showPassword = false;
+
+    togglePassword(): void {
+        this.showPassword = !this.showPassword;
+    }
 
     constructor(
         private fb: FormBuilder,

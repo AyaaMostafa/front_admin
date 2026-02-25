@@ -98,8 +98,8 @@ textarea {
 input:focus,
 textarea:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #44CDB8;
+    box-shadow: 0 0 0 3px rgba(68, 205, 184, 0.1);
 }
 
 input.invalid,
@@ -146,13 +146,14 @@ textarea {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #44CDB8;
     color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
+    background: #3bbca8;
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 10px 20px rgba(68, 205, 184, 0.3);
 }
 
 .btn-primary:disabled {
