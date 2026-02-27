@@ -1,96 +1,127 @@
-<div class="code-settings-container">
+<div class="code-settings-container panel-container">
+    <!-- Page Header -->
     <div class="page-header">
-        <h1>Code Settings</h1>
-        <p class="page-description">The following settings have been auto-configured based on your details.</p>
+        <div>
+            <h2 class="main-content-title tx-24 mg-b-5">Settings Configuration</h2>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Settings</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Code Settings</li>
+            </ol>
+        </div>
     </div>
 
-    <!-- Filter Dropdowns Above Container -->
-    <div class="filter-section">
-        <div class="filter-row">
-            <div class="filter-group">
-                <label for="filterCodeType">Code Type</label>
-                <select id="filterCodeType" [(ngModel)]="selectedCodeTypeId" class="filter-select">
-                    <option [value]="null">All Code Types</option>
-                    @for (codeType of codeTypes; track codeType.id) {
-                    <option [value]="codeType.id">{{ codeType.codeTypeCode }}</option>
-                    }
-                </select>
-            </div>
+    <div class="card custom-card mb-4">
+        <div class="card-body">
+            <h3 class="card-title">Select Code & Detail</h3>
+            <p class="card-description">Choose a combination below to automatically apply a setting.</p>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="filterCodeType" class="form-label">Code Type</label>
+                    <select id="filterCodeType" [(ngModel)]="selectedCodeTypeId" (change)="onSelectionChange()"
+                        class="form-control">
+                        <option [value]="null">Select Code Type</option>
+                        @for (codeType of codeTypes; track codeType.id) {
+                        <option [value]="codeType.id">{{ codeType.codeTypeCode }} - {{ codeType.nameEn }}</option>
+                        }
+                    </select>
+                </div>
 
-            <div class="filter-group">
-                <label for="filterAttributeDetail">Attribute Detail ID</label>
-                <select id="filterAttributeDetail" [(ngModel)]="selectedAttributeDetailId" class="filter-select">
-                    <option [value]="null">All Attribute Details</option>
-                    @for (detail of codeAttributeDetails; track detail.id) {
-                    <option [value]="detail.id">{{ detail.code }}</option>
-                    }
-                </select>
+                <div class="col-md-6 mb-3">
+                    <label for="filterAttributeDetail" class="form-label">Code Detail</label>
+                    <select id="filterAttributeDetail" [(ngModel)]="selectedAttributeDetailId"
+                        (change)="onSelectionChange()" class="form-control">
+                        <option [value]="null">Select Attribute Detail</option>
+                        @for (detail of codeAttributeDetails; track detail.id) {
+                        <option [value]="detail.id">{{ detail.code }} - {{ detail.nameEn }}</option>
+                        }
+                    </select>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Settings Container -->
-    <div class="content">
-        <div class="card">
-            <h3>Settings Configuration</h3>
+    <div class="content row row-sm">
+        <div class="col-lg-12 col-md-12">
+            <div class="card custom-card">
+                <div class="card-body">
+                    <h3 class="card-title">Auto-Configured Settings</h3>
+                    <p class="card-description">The following settings have been auto-configured based on your details.
+                    </p>
 
-            <app-alert *ngIf="successMessage" type="success" [message]="successMessage"></app-alert>
-            <app-alert *ngIf="errorMessage" type="error" [message]="errorMessage"></app-alert>
+                    <app-alert *ngIf="successMessage" type="success" [message]="successMessage"></app-alert>
+                    <app-alert *ngIf="errorMessage" type="error" [message]="errorMessage"></app-alert>
 
-            @if (isLoading) {
-            <div class="loading-container">
-                <div class="spinner-large"></div>
-                <p>Saving settings...</p>
-            </div>
-            }
-
-            @if (!isLoading && settings.length > 0) {
-            <div class="settings-display">
-                @for (setting of settings; track $index) {
-                <div class="setting-card">
-                    <div class="setting-row">
-                        <div class="setting-field">
-                            <label>Code</label>
-                            <input type="text" [value]="setting.code" readonly class="readonly-input" />
-                        </div>
-                        <div class="setting-field">
-                            <label>Sort Order</label>
-                            <input type="text" [value]="setting.sortOrder" readonly class="readonly-input" />
-                        </div>
-                        <div class="setting-field">
-                            <label>Separator</label>
-                            <input type="text" [value]="setting.separator" readonly class="readonly-input" />
-                        </div>
-                        <div class="setting-field">
-                            <label>Required</label>
-                            <input type="text" [value]="setting.isRequired ? 'Yes' : 'No'" readonly
-                                class="readonly-input" />
-                        </div>
-                    </div>
-                </div>
-                }
-            </div>
-
-            <div class="form-actions">
-                <button class="btn btn-success" (click)="saveAllSettings()" [disabled]="isLoading">
                     @if (isLoading) {
-                    <span class="spinner"></span>
-                    Saving...
-                    } @else {
-                    Continue to Sequence
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Saving settings...</p>
+                    </div>
                     }
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
-                </button>
-            </div>
-            }
 
-            @if (!isLoading && settings.length === 0) {
-            <div class="no-results">
-                <p>No settings available. Please complete previous steps.</p>
+                    @if (!isLoading && settings.length > 0) {
+                    <div class="attributes-items-container">
+                        @for (setting of settings; track $index) {
+                        <div class="attribute-item">
+                            <div class="attribute-header">
+                                <h4>Setting #{{ $index + 1 }}</h4>
+                                <button type="button" class="btn btn-danger-delete btn-sm"
+                                    (click)="removeSetting($index)">
+                                    ✕ Remove
+                                </button>
+                            </div>
+                            <div class="attribute-details">
+                                <div class="detail-row">
+                                    <div class="detail-item">
+                                        <strong>Code Type</strong>
+                                        <span>{{ getCodeTypeLabel(setting.codeTypeId) }}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Code Detail</strong>
+                                        <span>{{ getAttributeDetailLabel(setting.attributeDetailId) }}</span>
+                                    </div>
+                                </div>
+                                <div class="detail-row mt-3">
+                                    <div class="detail-item">
+                                        <strong>Separator</strong>
+                                        <span>{{ setting.separator }}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Required</strong>
+                                        <span>{{ setting.isRequired ? 'Yes' : 'No' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+
+                    <div class="d-flex justify-content-center mt-4">
+                        <button class="btn btn-primary-save btn-lg px-5" (click)="saveAllSettings()"
+                            [disabled]="isLoading">
+                            @if (isLoading) {
+                            <span class="spinner-border spinner-border-sm me-1"></span>
+                            Saving...
+                            } @else {
+                            Continue to Sequence <i class="fa fa-arrow-right ms-2"></i>
+                            }
+                        </button>
+                    </div>
+                    }
+
+                    @if (!isLoading && settings.length === 0) {
+                    <div class="text-center py-5">
+                        <div class="mb-3 text-muted">
+                            <i class="fa fa-info-circle fa-3x"></i>
+                        </div>
+                        <p class="text-muted">No settings available. Please select options above or complete previous
+                            steps.</p>
+                    </div>
+                    }
+                </div>
             </div>
-            }
         </div>
     </div>
 </div>

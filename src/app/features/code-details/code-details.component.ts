@@ -47,10 +47,10 @@ export class CodeDetailsComponent implements OnInit {
     initForm() {
         this.detailForm = this.fb.group({
             code: ['', [Validators.required, Validators.minLength(2)]],
-            nameAr: ['', [Validators.required]],
+            nameAr: [''],
             nameEn: ['', [Validators.required]],
-            descriptionAr: ['', [Validators.required]],
-            descriptionEn: ['', [Validators.required]],
+            descriptionAr: [''],
+            descriptionEn: [''],
             sortOrder: [this.details.length + 1, [Validators.required]]
         });
     }
@@ -77,7 +77,7 @@ export class CodeDetailsComponent implements OnInit {
             this.detailForm.reset();
             this.detailForm.patchValue({ sortOrder: this.details.length + 1 });
             this.errorMessage = '';
-            
+
             setTimeout(() => {
                 this.successMessage = '';
             }, 2000);
@@ -92,7 +92,7 @@ export class CodeDetailsComponent implements OnInit {
         });
         this.detailForm.patchValue({ sortOrder: this.details.length + 1 });
         this.successMessage = `Detail removed! Total: ${this.details.length}`;
-        
+
         setTimeout(() => {
             this.successMessage = '';
         }, 2000);
@@ -133,7 +133,7 @@ export class CodeDetailsComponent implements OnInit {
                         this.isLoading = false;
                         this.successMessage = `All ${totalCount} details saved successfully!`;
                         this.codeGeneratorService.completeStep(3);
-                        
+
                         setTimeout(() => {
                             this.router.navigate(['/code-settings']);
                         }, 1500);

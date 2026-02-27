@@ -4,12 +4,12 @@ import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } 
 import { CodeGenerationService } from '../../core/services/code-generation.service';
 import { CodeGeneratorService } from '../../core/services/code-generator.service';
 import { AlertComponent } from '../../shared/components/alert/alert.component';
-import { ButtonComponent } from '../../shared/components/button/button.component';
+
 
 @Component({
     selector: 'app-code-generation',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, AlertComponent, ButtonComponent],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, AlertComponent],
     templateUrl: './code-generation.component.html',
     styleUrl: './code-generation.component.css'
 })
@@ -46,10 +46,10 @@ export class CodeGenerationComponent implements OnInit {
 
     initForm() {
         this.generationForm = this.fb.group({
-            nameAr: ['', [Validators.required]],
+            nameAr: [''],
             nameEn: ['', [Validators.required]],
-            descriptionAr: ['', [Validators.required]],
-            descriptionEn: ['', [Validators.required]],
+            descriptionAr: [''],
+            descriptionEn: [''],
             externalSystem: ['', [Validators.required]],
             externalReferenceId: ['', [Validators.required]]
         });

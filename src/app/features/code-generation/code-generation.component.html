@@ -1,123 +1,153 @@
-<div class="code-generation-container">
-    <div class="header">
-        <h2>Code Generation</h2>
-        <p class="description">Generate your final code based on configurations</p>
+<div class="code-generation-container panel-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h2 class="main-content-title tx-24 mg-b-5">Step 6: Final Generation</h2>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Generation</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Code Generation</li>
+            </ol>
+        </div>
     </div>
 
-    <div class="content">
-        <!-- Generated Code Reveal (shown after generation) -->
-                @if (showCodeReveal) {
-                <div class="code-reveal-card">
-                    <div class="celebration-icon">🎉</div>
-                    <h3>Code Generated Successfully!</h3>
-                    <div class="generated-code-display">
-                        <div class="code-label">Your Generated Code:</div>
-                        <div class="code-value">
-                            {{ generatedCode }}
-                        </div>
-                        <button class="btn-copy" (click)="copyToClipboard()">
-                            @if (copiedToClipboard) {
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path d="M20 6L9 17l-5-5" />
-                            </svg>
-                            Copied!
-                            } @else {
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
-                            </svg>
-                            Copy to Clipboard
-                            }
-                        </button>
-                    </div>
-                    <p class="success-message">
-                        Your code has been generated and is ready to use!
+    <!-- Alert Messages -->
+    <app-alert *ngIf="errorMessage" type="error" [message]="errorMessage"></app-alert>
+
+    <div class="content row row-sm">
+        <!-- Form Column -->
+        <div class="col-lg-12 col-md-12" [class.d-none]="showCodeReveal">
+            <div class="card custom-card">
+                <div class="card-body">
+                    <h3 class="card-title">Code Generation Details</h3>
+                    <p class="card-description">Configure the final identifiers (Optional Arabic name & descriptions).
                     </p>
-                </div>
-                }
 
-                <!-- Generation Form -->
-                <div class="card" [class.hidden]="showCodeReveal">
-                    <h3>Code Generation</h3>
-                    <p>Fill in the details below to generate your code.</p>
-
-                    <app-alert *ngIf="errorMessage" type="error" [message]="errorMessage"></app-alert>
-                    <form [formGroup]="generationForm" (ngSubmit)="onGenerate()" class="form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="nameAr">Name (Arabic) <span class="required">*</span></label>
-                                <input id="nameAr" type="text" formControlName="nameAr" placeholder="الاسم بالعربية"
-                                    dir="rtl" [class.invalid]="nameAr?.invalid && nameAr?.touched" />
-                                @if (nameAr?.invalid && nameAr?.touched) {
-                                <span class="error-text">Arabic name is required</span>
-                                }
+                    <form [formGroup]="generationForm" (ngSubmit)="onGenerate()">
+                        <div class="row row-sm">
+                            <div class="col-md-6 mb-3">
+                                <label for="nameAr" class="form-label">Name (Arabic)</label>
+                                <input type="text" id="nameAr" formControlName="nameAr" class="form-control"
+                                    placeholder="الاسم بالعربية" dir="rtl">
                             </div>
-
-                            <div class="form-group">
-                                <label for="nameEn">Name (English) <span class="required">*</span></label>
-                                <input id="nameEn" type="text" formControlName="nameEn" placeholder="English Name"
-                                    [class.invalid]="nameEn?.invalid && nameEn?.touched" />
-                                @if (nameEn?.invalid && nameEn?.touched) {
-                                <span class="error-text">English name is required</span>
-                                }
+                            <div class="col-md-6 mb-3">
+                                <label for="nameEn" class="form-label">Name (English) <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" id="nameEn" formControlName="nameEn" class="form-control"
+                                    [class.is-invalid]="nameEn?.invalid && nameEn?.touched"
+                                    placeholder="English Identity Name">
                             </div>
                         </div>
 
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="descriptionAr">Description (Arabic) <span class="required">*</span></label>
-                                <textarea id="descriptionAr" formControlName="descriptionAr" placeholder="الوصف بالعربية"
-                                    dir="rtl" rows="4"
-                                    [class.invalid]="descriptionAr?.invalid && descriptionAr?.touched"></textarea>
-                                @if (descriptionAr?.invalid && descriptionAr?.touched) {
-                                <span class="error-text">Arabic description is required</span>
-                                }
+                        <div class="row row-sm mt-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="descriptionAr" class="form-label">Description (Arabic)</label>
+                                <textarea id="descriptionAr" formControlName="descriptionAr" class="form-control"
+                                    rows="3" dir="rtl" placeholder="الوصف بالعربية"></textarea>
                             </div>
-
-                            <div class="form-group">
-                                <label for="descriptionEn">Description (English) <span class="required">*</span></label>
-                                <textarea id="descriptionEn" formControlName="descriptionEn" placeholder="English Description"
-                                    rows="4" [class.invalid]="descriptionEn?.invalid && descriptionEn?.touched"></textarea>
-                                @if (descriptionEn?.invalid && descriptionEn?.touched) {
-                                <span class="error-text">English description is required</span>
-                                }
+                            <div class="col-md-6 mb-3">
+                                <label for="descriptionEn" class="form-label">Description (English)</label>
+                                <textarea id="descriptionEn" formControlName="descriptionEn" class="form-control"
+                                    rows="3" placeholder="English Description"></textarea>
                             </div>
                         </div>
 
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="externalSystem">External System <span class="required">*</span></label>
-                                <input id="externalSystem" type="text" formControlName="externalSystem" placeholder="e.g., INVV"
-                                    [class.invalid]="externalSystem?.invalid && externalSystem?.touched" />
-                                @if (externalSystem?.invalid && externalSystem?.touched) {
-                                <span class="error-text">External system is required</span>
-                                }
+                        <div class="row row-sm mt-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="externalSystem" class="form-label">External System <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" id="externalSystem" formControlName="externalSystem"
+                                    class="form-control"
+                                    [class.is-invalid]="externalSystem?.invalid && externalSystem?.touched"
+                                    placeholder="e.g. INVV, ERP, HIS">
                             </div>
-
-                            <div class="form-group">
-                                <label for="externalReferenceId">External Reference ID <span class="required">*</span></label>
-                                <input id="externalReferenceId" type="text" formControlName="externalReferenceId"
-                                    placeholder="e.g., SRV-CARD-002"
-                                    [class.invalid]="externalReferenceId?.invalid && externalReferenceId?.touched" />
-                                @if (externalReferenceId?.invalid && externalReferenceId?.touched) {
-                                <span class="error-text">External reference ID is required</span>
-                                }
+                            <div class="col-md-6 mb-3">
+                                <label for="externalReferenceId" class="form-label">External Reference ID <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" id="externalReferenceId" formControlName="externalReferenceId"
+                                    class="form-control"
+                                    [class.is-invalid]="externalReferenceId?.invalid && externalReferenceId?.touched"
+                                    placeholder="e.g. SRV-001, REF-ABC">
                             </div>
                         </div>
 
-                        <div class="form-actions">
-                            <app-button type="submit" [loading]="isLoading" [disabled]="isLoading">
+                        <div class="d-flex justify-content-center mt-4 pt-4 border-top">
+                            <button type="submit" class="btn btn-primary-save btn-lg px-5"
+                                [disabled]="generationForm.invalid || isLoading">
                                 @if (isLoading) {
-                                Creating...
+                                <span class="spinner-border spinner-border-sm me-1"></span>
+                                Generating...
                                 } @else {
-                                Generate Code
+                                Generate My Code <i class="fa fa-magic ms-2"></i>
                                 }
-                                Generate Code
-                            </app-button>
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
+        </div>
+
+        <!-- Success Reveal Column -->
+        <div class="col-lg-12 col-md-12" *ngIf="showCodeReveal">
+            <div class="card custom-card">
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <i class="fa fa-rocket fa-5x text-success"></i>
+                    </div>
+                    <h3 class="card-title tx-24">Generation Complete!</h3>
+                    <p class="card-description">Your data has been successfully processed and the code minted.</p>
+
+                    <div class="row justify-content-center mt-4">
+                        <div class="col-md-8">
+                            <!-- Premium Summary Card Design -->
+                            <div class="attribute-item text-start">
+                                <div class="attribute-header">
+                                    <h4>Generation Result</h4>
+                                    <span class="badge bg-success-transparent tx-12">New</span>
+                                </div>
+                                <div class="attribute-details">
+                                    <div class="detail-row">
+                                        <div class="detail-item w-100">
+                                            <strong>Generated Code Identifier</strong>
+                                            <div class="generated-code-display mt-2">
+                                                <code>{{ generatedCode }}</code>
+                                                <button class="btn btn-primary-save btn-sm ms-3"
+                                                    (click)="copyToClipboard()">
+                                                    <i class="fa" [class.fa-check]="copiedToClipboard"
+                                                        [class.fa-copy]="!copiedToClipboard"></i>
+                                                    {{ copiedToClipboard ? 'Copied' : 'Copy' }}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="detail-row mt-3">
+                                        <div class="detail-item">
+                                            <strong>Identity Name</strong>
+                                            <span>{{ generationForm.value.nameEn }}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <strong>System Reference</strong>
+                                            <span>{{ generationForm.value.externalSystem }} - {{
+                                                generationForm.value.externalReferenceId }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 pt-4 border-top">
+                        <p class="text-muted mb-4">The code above is now registered and ready for integration.</p>
+                        <div class="d-flex justify-content-center gap-3">
+                            <button class="btn btn-outline-primary px-5" (click)="showCodeReveal = false">
+                                <i class="fa fa-edit me-2"></i> Edit Details
+                            </button>
+                            <a routerLink="/dashboard" class="btn btn-primary-save px-5">
+                                <i class="fa fa-home me-2"></i> Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

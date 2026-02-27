@@ -31,6 +31,10 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/code-type/code-type.component').then(m => m.CodeTypeComponent)
             },
             {
+                path: 'all-code-types',
+                loadComponent: () => import('./features/code-type-list/code-type-list.component').then(m => m.CodeTypeListComponent)
+            },
+            {
                 path: 'code-type-attribute',
                 loadComponent: () => import('./features/code-type-attribute/code-type-attribute.component').then(m => m.CodeTypeAttributeComponent)
             },

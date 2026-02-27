@@ -27,18 +27,24 @@ export class SidebarComponent {
             icon: '',
             children: [
                 {
-                    label: 'Dashboards',
+                    label: 'Dashboard',
                     icon: 'home',
+                    route: '/dashboard'
+                },
+                {
+                    label: 'Code Type',
+                    icon: 'grid',
                     expanded: true,
                     children: [
-                        { label: 'Code Type', icon: '', route: '/code-type' },
-                        { label: 'Code Type Attribute', icon: '', route: '/code-type-attribute' },
-                        { label: 'Code Type Main', icon: '', route: '/code-type-main' },
-                        { label: 'Code Settings', icon: '', route: '/code-settings' },
-                        { label: 'Code Sequence', icon: '', route: '/code-sequence' },
-                        { label: 'Code Generation', icon: '', route: '/code-generation' }
+                        { label: 'All Code Types', icon: '', route: '/all-code-types' },
+                        { label: 'Create New', icon: '', route: '/code-type' }
                     ]
-                }
+                },
+                { label: 'Type Attribute', icon: 'layers', route: '/code-type-attribute' },
+                { label: 'Main Entries', icon: 'box', route: '/code-type-main' },
+                { label: 'Settings', icon: 'settings', route: '/code-settings' },
+                { label: 'Sequence', icon: 'bar-chart', route: '/code-sequence' },
+                { label: 'Generation', icon: 'file-text', route: '/code-generation' }
             ]
         }
     ]);

@@ -48,7 +48,10 @@ export class CodeSequenceComponent implements OnInit {
 
     initForm() {
         this.sequenceForm = this.fb.group({
+            nameAr: [''],
             nameEn: ['', [Validators.required]],
+            descriptionAr: [''],
+            descriptionEn: [''],
             startWith: [100, [Validators.required, Validators.min(1)]],
             minValue: [100, [Validators.required, Validators.min(1)]],
             maxValue: [9999, [Validators.required, Validators.min(1)]],
@@ -63,8 +66,13 @@ export class CodeSequenceComponent implements OnInit {
             this.errorMessage = '';
 
             const requestData = {
-                ...this.sequenceForm.value,
-                codeTypeId: this.codeTypeId
+                nameEn: this.sequenceForm.value.nameEn,
+                codeTypeId: this.codeTypeId,
+                startWith: this.sequenceForm.value.startWith,
+                minValue: this.sequenceForm.value.minValue,
+                maxValue: this.sequenceForm.value.maxValue,
+                currentValue: this.sequenceForm.value.currentValue,
+                isCycling: this.sequenceForm.value.isCycling
             };
 
             this.codeTypeSequenceService.createCodeTypeSequence(requestData).subscribe({
@@ -117,7 +125,10 @@ export class CodeSequenceComponent implements OnInit {
         this.isSidebarCollapsed = !this.isSidebarCollapsed;
     }
 
+    get nameAr() { return this.sequenceForm.get('nameAr'); }
     get nameEn() { return this.sequenceForm.get('nameEn'); }
+    get descriptionAr() { return this.sequenceForm.get('descriptionAr'); }
+    get descriptionEn() { return this.sequenceForm.get('descriptionEn'); }
     get startWith() { return this.sequenceForm.get('startWith'); }
     get minValue() { return this.sequenceForm.get('minValue'); }
     get maxValue() { return this.sequenceForm.get('maxValue'); }

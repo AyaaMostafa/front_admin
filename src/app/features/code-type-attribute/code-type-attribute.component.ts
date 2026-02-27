@@ -35,10 +35,10 @@ export class CodeTypeAttributeComponent implements OnInit {
 
     initForm() {
         this.attributeForm = this.fb.group({
-            nameAr: ['', [Validators.required]],
+            nameAr: [''],
             nameEn: ['', [Validators.required]],
-            descriptionAr: ['', [Validators.required]],
-            descriptionEn: ['', [Validators.required]]
+            descriptionAr: [''],
+            descriptionEn: ['']
         });
     }
 
@@ -58,7 +58,7 @@ export class CodeTypeAttributeComponent implements OnInit {
             this.successMessage = `Attribute added! Total: ${this.attributes.length}`;
             this.attributeForm.reset();
             this.errorMessage = '';
-            
+
             setTimeout(() => {
                 this.successMessage = '';
             }, 2000);
@@ -68,7 +68,7 @@ export class CodeTypeAttributeComponent implements OnInit {
     removeAttribute(index: number) {
         this.attributes.splice(index, 1);
         this.successMessage = `Attribute removed! Total: ${this.attributes.length}`;
-        
+
         setTimeout(() => {
             this.successMessage = '';
         }, 2000);
@@ -98,7 +98,7 @@ export class CodeTypeAttributeComponent implements OnInit {
                         this.isLoading = false;
                         this.successMessage = `All ${totalCount} attributes saved successfully!`;
                         this.codeGeneratorService.completeStep(1);
-                        
+
                         setTimeout(() => {
                             this.router.navigate(['/code-type-main']);
                         }, 1500);

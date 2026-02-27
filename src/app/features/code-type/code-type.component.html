@@ -51,14 +51,9 @@
 
                             <!-- Name Arabic -->
                             <div class="col-md-6 mb-3">
-                                <label for="nameAr" class="form-label">Name (Ar) <span
-                                        class="text-danger">*</span></label>
+                                <label for="nameAr" class="form-label">Name (Ar)</label>
                                 <input id="nameAr" type="text" class="form-control" formControlName="nameAr"
-                                    placeholder="Enter Arabic Name"
-                                    [class.is-invalid]="nameAr?.invalid && nameAr?.touched" />
-                                <div class="invalid-feedback" *ngIf="nameAr?.invalid && nameAr?.touched">
-                                    Arabic name is required
-                                </div>
+                                    placeholder="Enter Arabic Name" />
                             </div>
                         </div>
 
@@ -67,22 +62,14 @@
                             <div class="col-md-12 mb-3">
                                 <label for="descriptionEn" class="form-label">Description (En)</label>
                                 <textarea id="descriptionEn" class="form-control" formControlName="descriptionEn"
-                                    placeholder="Enter English Description" rows="3"
-                                    [class.is-invalid]="descriptionEn?.invalid && descriptionEn?.touched"></textarea>
-                                <div class="invalid-feedback" *ngIf="descriptionEn?.invalid && descriptionEn?.touched">
-                                    English description is required
-                                </div>
+                                    placeholder="Enter English Description" rows="3"></textarea>
                             </div>
 
                             <!-- Description Arabic -->
                             <div class="col-md-12 mb-3">
                                 <label for="descriptionAr" class="form-label">Description (Ar)</label>
                                 <textarea id="descriptionAr" class="form-control" formControlName="descriptionAr"
-                                    placeholder="Enter Arabic Description" dir="rtl" rows="3"
-                                    [class.is-invalid]="descriptionAr?.invalid && descriptionAr?.touched"></textarea>
-                                <div class="invalid-feedback" *ngIf="descriptionAr?.invalid && descriptionAr?.touched">
-                                    Arabic description is required
-                                </div>
+                                    placeholder="Enter Arabic Description" dir="rtl" rows="3"></textarea>
                             </div>
                         </div>
 

@@ -22,7 +22,7 @@ interface SettingDisplay {
 @Component({
     selector: 'app-code-settings',
     standalone: true,
-    imports: [CommonModule, AlertComponent,FormsModule],
+    imports: [CommonModule, AlertComponent, FormsModule],
     templateUrl: './code-settings.component.html',
     styleUrl: './code-settings.component.css'
 })
@@ -41,6 +41,38 @@ export class CodeSettingsComponent implements OnInit {
     selectedCodeTypeId: number | null = null;
     selectedAttributeDetailId: number | null = null;
 
+    onSelectionChange() {
+        if (this.selectedCodeTypeId && this.selectedAttributeDetailId) {
+            const alreadyExists = this.settings.some(s =>
+                s.codeTypeId === this.selectedCodeTypeId &&
+                s.attributeDetailId === this.selectedAttributeDetailId
+            );
+
+            if (!alreadyExists) {
+                const detail = this.codeAttributeDetails.find(d => d.id === this.selectedAttributeDetailId);
+                this.settings.push({
+                    code: detail ? detail.code : `DETAIL-${this.selectedAttributeDetailId}`,
+                    codeTypeId: this.selectedCodeTypeId,
+                    attributeDetailId: this.selectedAttributeDetailId,
+                    sortOrder: this.settings.length + 1,
+                    separator: '-',
+                    isRequired: true
+                });
+
+                this.successMessage = 'Setting applied successfully!';
+
+                // Clear selections to allow adding more if desired
+                this.selectedCodeTypeId = null;
+                this.selectedAttributeDetailId = null;
+
+                setTimeout(() => this.successMessage = '', 2000);
+            } else {
+                this.errorMessage = 'This setting combination already exists in the list.';
+                setTimeout(() => this.errorMessage = '', 2000);
+            }
+        }
+    }
+
     codeTypeId!: number;
     detailIds: number[] = [];
     savedCodes: string[] = [];
@@ -56,18 +88,20 @@ export class CodeSettingsComponent implements OnInit {
 
     ngOnInit() {
         const state = this.codeGeneratorService.getState();
-        this.codeTypeId = state.codeTypeId!;
-        this.detailIds = state.codeAttributeDetailIds;
+        this.codeTypeId = state.codeTypeId ?? 0;
+        this.detailIds = state.codeAttributeDetailIds || [];
 
-        if (!this.codeTypeId || this.detailIds.length === 0) {
-            this.errorMessage = 'Missing required data. Please complete previous steps.';
-            return;
-        }
-
-        this.savedCodes = this.getSavedCodesFromDetails();
-
+        // Always load dropdown data so manual selection works
         this.loadDropdownData();
-        this.autoFillSettings();
+
+        // If we have details from previous step, auto-fill them
+        if (this.detailIds.length > 0) {
+            this.savedCodes = this.getSavedCodesFromDetails();
+            this.autoFillSettings();
+        } else {
+            this.savedCodes = [];
+            // We don't block anymore, just let the user add manually or see a softer message
+        }
     }
 
     loadDropdownData() {
@@ -96,6 +130,13 @@ export class CodeSettingsComponent implements OnInit {
         // For now, return placeholder codes in order based on detail IDs
         // You would call an API endpoint like: GET /CodeAttributeDetails/{id}
         return this.detailIds.map((id, index) => `CODE${index + 1}`);
+    }
+
+    removeSetting(index: number) {
+        this.settings.splice(index, 1);
+        this.settings.forEach((s, i) => s.sortOrder = i + 1);
+        this.successMessage = 'Setting removed';
+        setTimeout(() => this.successMessage = '', 2000);
     }
 
     autoFillSettings() {
@@ -177,11 +218,11 @@ export class CodeSettingsComponent implements OnInit {
 
     getCodeTypeLabel(id: number): string {
         const codeType = this.codeTypes.find(ct => ct.id === id);
-        return codeType ? codeType.codeTypeCode : `ID: ${id}`;
+        return codeType ? `${codeType.codeTypeCode} - ${codeType.nameEn}` : `ID: ${id}`;
     }
 
     getAttributeDetailLabel(id: number): string {
         const detail = this.codeAttributeDetails.find(ad => ad.id === id);
-        return detail ? detail.code : `ID: ${id}`;
+        return detail ? `${detail.code} - ${detail.nameEn}` : `ID: ${id}`;
     }
 }

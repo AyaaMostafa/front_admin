@@ -1,132 +1,173 @@
-<div class="code-sequence-container">
-    <div class="header">
-        <h2>Code Sequence</h2>
-        <p class="description">Configure sequence settings for code generation</p>
+<div class="code-sequence-container panel-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h2 class="main-content-title tx-24 mg-b-5">Sequence Configuration</h2>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Sequence</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Code Sequence</li>
+            </ol>
+        </div>
     </div>
 
-    <div class="content">
-        <!-- Success Display with Countdown -->
-        @if (sequenceData) {
-        <div class="success-card">
-            <div class="success-icon">✓</div>
-            <h3>Sequence Created Successfully!</h3>
+    <!-- Alert Messages -->
+    <app-alert *ngIf="successMessage && !sequenceData" type="success" [message]="successMessage"></app-alert>
+    <app-alert *ngIf="errorMessage" type="error" [message]="errorMessage"></app-alert>
 
-            <div class="sequence-details">
-                <div class="detail-row">
-                    <span class="label">Name:</span>
-                    <span class="value">{{ sequenceData.nameEn }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Start With:</span>
-                    <span class="value">{{ sequenceData.startWith }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Range:</span>
-                    <span class="value">{{ sequenceData.minValue }} - {{ sequenceData.maxValue }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Current Value:</span>
-                    <span class="value">{{ sequenceData.currentValue }}</span>
-                </div>
-            </div>
+    <div class="content row row-sm">
+        <!-- Form Column -->
+        <div class="col-lg-12 col-md-12" *ngIf="!sequenceData">
+            <div class="card custom-card">
+                <div class="card-body">
+                    <h3 class="card-title">Define Sequence</h3>
+                    <p class="card-description">Set the range and start values for auto-incrementing codes.</p>
 
-            <div class="countdown-display">
-                <p>Automatically proceeding to Code Generation in:</p>
-                <div class="countdown-timer">{{ countdown }}</div>
-                <p class="countdown-text">seconds</p>
-                <button class="btn btn-skip" (click)="skipToGeneration()">
-                    Skip & Continue Now
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
-                </button>
+                    <form [formGroup]="sequenceForm" (ngSubmit)="onSubmit()">
+                        <div class="row row-sm">
+                            <div class="col-md-6 mb-3">
+                                <label for="nameAr" class="form-label">Sequence Name (Arabic) <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" id="nameAr" formControlName="nameAr" class="form-control"
+                                    [class.is-invalid]="nameAr?.invalid && nameAr?.touched" placeholder="الاسم بالعربية"
+                                    dir="rtl">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="nameEn" class="form-label">Sequence Name (English) <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" id="nameEn" formControlName="nameEn" class="form-control"
+                                    [class.is-invalid]="nameEn?.invalid && nameEn?.touched" placeholder="English Name">
+                            </div>
+                        </div>
+
+                        <div class="row row-sm mt-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="descriptionAr" class="form-label">Description (Arabic)</label>
+                                <textarea id="descriptionAr" formControlName="descriptionAr" class="form-control"
+                                    rows="3" dir="rtl" placeholder="الوصف بالعربية"></textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="descriptionEn" class="form-label">Description (English)</label>
+                                <textarea id="descriptionEn" formControlName="descriptionEn" class="form-control"
+                                    rows="3" placeholder="English Description"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row row-sm mt-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="startWith" class="form-label">Start With <span
+                                        class="text-danger">*</span></label>
+                                <input type="number" id="startWith" formControlName="startWith" class="form-control"
+                                    [class.is-invalid]="startWith?.invalid && startWith?.touched">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="currentValue" class="form-label">Current Value <span
+                                        class="text-danger">*</span></label>
+                                <input type="number" id="currentValue" formControlName="currentValue"
+                                    class="form-control"
+                                    [class.is-invalid]="currentValue?.invalid && currentValue?.touched">
+                            </div>
+                        </div>
+
+                        <div class="row row-sm mt-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="minValue" class="form-label">Minimum Value <span
+                                        class="text-danger">*</span></label>
+                                <input type="number" id="minValue" formControlName="minValue" class="form-control"
+                                    [class.is-invalid]="minValue?.invalid && minValue?.touched">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="maxValue" class="form-label">Maximum Value <span
+                                        class="text-danger">*</span></label>
+                                <input type="number" id="maxValue" formControlName="maxValue" class="form-control"
+                                    [class.is-invalid]="maxValue?.invalid && maxValue?.touched">
+                            </div>
+                        </div>
+
+                        <div class="row row-sm mt-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="isCycling" class="form-label">Cycling Value <span
+                                        class="text-danger">*</span></label>
+                                <input type="number" id="isCycling" formControlName="isCycling" class="form-control"
+                                    [class.is-invalid]="isCycling?.invalid && isCycling?.touched"
+                                    placeholder="Enter cycling value">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="submit" class="btn btn-primary-save px-5"
+                                [disabled]="sequenceForm.invalid || isLoading">
+                                @if (isLoading) {
+                                <span class="spinner-border spinner-border-sm me-1"></span>
+                                Processing...
+                                } @else {
+                                Save & Continue <i class="fa fa-arrow-right ms-2"></i>
+                                }
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-        }
 
-        <!-- Form -->
-        <div class="card" [class.hidden]="sequenceData">
-            <h3>Sequence Configuration</h3>
-            <p>Define the sequence settings for auto-incrementing codes.</p>
+        <!-- Success Display -->
+        <div class="col-lg-12 col-md-12" *ngIf="sequenceData">
+            <div class="card custom-card">
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <i class="fa fa-check-circle fa-5x text-success"></i>
+                    </div>
+                    <h3 class="card-title tx-24">Sequence Created Successfully!</h3>
+                    <p class="card-description">Your sequence settings have been applied.</p>
 
-            <app-alert *ngIf="successMessage && !sequenceData" type="success" [message]="successMessage"></app-alert>
-            <app-alert *ngIf="errorMessage" type="error" [message]="errorMessage"></app-alert>
+                    <div class="row justify-content-center mt-4">
+                        <div class="col-md-8">
+                            <div class="attribute-item text-start">
+                                <div class="attribute-header">
+                                    <h4>Sequence Details</h4>
+                                </div>
+                                <div class="attribute-details">
+                                    <div class="detail-row">
+                                        <div class="detail-item w-100">
+                                            <strong>Sequence Name</strong>
+                                            <span>{{ sequenceData.nameEn }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="detail-row mt-3">
+                                        <div class="detail-item">
+                                            <strong>Range</strong>
+                                            <span>{{ sequenceData.minValue }} - {{ sequenceData.maxValue }}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <strong>Start Value</strong>
+                                            <span>{{ sequenceData.startWith }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="detail-row mt-3">
+                                        <div class="detail-item">
+                                            <strong>Current Value</strong>
+                                            <span>{{ sequenceData.currentValue }}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <strong>Cycling Value</strong>
+                                            <span>{{ sequenceData.isCycling }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-            <form [formGroup]="sequenceForm" (ngSubmit)="onSubmit()" class="form">
-                <div class="form-row">
-                    <div class="form-group full-width">
-                        <label for="nameEn">Sequence Name <span class="required">*</span></label>
-                        <input id="nameEn" type="text" formControlName="nameEn" placeholder="e.g., SEQ"
-                            [class.invalid]="nameEn?.invalid && nameEn?.touched" />
-                        @if (nameEn?.invalid && nameEn?.touched) {
-                        <span class="error-text">Sequence name is required</span>
-                        }
+                    <div class="mt-5">
+                        <p class="text-muted">Automatically proceeding to Code Generation in:</p>
+                        <div class="display-4 font-weight-bold text-primary mb-3">{{ countdown }}</div>
+                        <p class="text-muted small">seconds</p>
+
+                        <button class="btn btn-primary-save btn-lg px-5 mt-3" (click)="skipToGeneration()">
+                            Skip & Continue Now <i class="fa fa-arrow-right ms-2"></i>
+                        </button>
                     </div>
                 </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="startWith">Start With <span class="required">*</span></label>
-                        <input id="startWith" type="number" formControlName="startWith" placeholder="100"
-                            [class.invalid]="startWith?.invalid && startWith?.touched" />
-                        @if (startWith?.invalid && startWith?.touched) {
-                        <span class="error-text">Start value is required</span>
-                        }
-                    </div>
-
-                    <div class="form-group">
-                        <label for="currentValue">Current Value <span class="required">*</span></label>
-                        <input id="currentValue" type="number" formControlName="currentValue" placeholder="100"
-                            [class.invalid]="currentValue?.invalid && currentValue?.touched" />
-                        @if (currentValue?.invalid && currentValue?.touched) {
-                        <span class="error-text">Current value is required</span>
-                        }
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="minValue">Minimum Value <span class="required">*</span></label>
-                        <input id="minValue" type="number" formControlName="minValue" placeholder="100"
-                            [class.invalid]="minValue?.invalid && minValue?.touched" />
-                        @if (minValue?.invalid && minValue?.touched) {
-                        <span class="error-text">Minimum value is required</span>
-                        }
-                    </div>
-
-                    <div class="form-group">
-                        <label for="maxValue">Maximum Value <span class="required">*</span></label>
-                        <input id="maxValue" type="number" formControlName="maxValue" placeholder="9999"
-                            [class.invalid]="maxValue?.invalid && maxValue?.touched" />
-                        @if (maxValue?.invalid && maxValue?.touched) {
-                        <span class="error-text">Maximum value is required</span>
-                        }
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="isCycling">Cycling <span class="required">*</span></label>
-                        <input id="isCycling" type="number" formControlName="isCycling" placeholder="0"
-                            [class.invalid]="isCycling?.invalid && isCycling?.touched" />
-                        @if (isCycling?.invalid && isCycling?.touched) {
-                        <span class="error-text">Cycling value is required</span>
-                        }
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" [disabled]="isLoading">
-                        @if (isLoading) {
-                        <span class="spinner"></span>
-                        Creating...
-                        } @else {
-                        Create Sequence
-                        }
-                        Save
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>

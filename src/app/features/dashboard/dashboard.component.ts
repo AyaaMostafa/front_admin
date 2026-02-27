@@ -2,13 +2,12 @@ import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CodeGeneratorService } from '../../core/services/code-generator.service';
-import { AlertComponent } from '../../shared/components/alert/alert.component';
-import { ButtonComponent } from '../../shared/components/button/button.component';
+
 
 @Component({
     selector: 'app-dashboard',
     standalone: true,
-    imports: [CommonModule, AlertComponent, ButtonComponent],
+    imports: [CommonModule],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.css'
 })

@@ -26,14 +26,9 @@
                         <div class="row">
                             <!-- Name Arabic -->
                             <div class="col-md-6 mb-3">
-                                <label for="nameAr" class="form-label">Name (Arabic) <span
-                                        class="text-danger">*</span></label>
+                                <label for="nameAr" class="form-label">Name (Arabic)</label>
                                 <input id="nameAr" type="text" class="form-control" formControlName="nameAr"
-                                    placeholder="الاسم بالعربية" dir="rtl"
-                                    [class.is-invalid]="nameAr?.invalid && nameAr?.touched" />
-                                <div class="error-text" *ngIf="nameAr?.invalid && nameAr?.touched">
-                                    Arabic name is required
-                                </div>
+                                    placeholder="الاسم بالعربية" dir="rtl" />
                             </div>
 
                             <!-- Name English -->
@@ -52,26 +47,16 @@
                         <div class="row">
                             <!-- Description Arabic -->
                             <div class="col-md-6 mb-3">
-                                <label for="descriptionAr" class="form-label">Description (Arabic) <span
-                                        class="text-danger">*</span></label>
+                                <label for="descriptionAr" class="form-label">Description (Arabic)</label>
                                 <textarea id="descriptionAr" class="form-control" formControlName="descriptionAr"
-                                    placeholder="الوصف بالعربية" dir="rtl" rows="3"
-                                    [class.is-invalid]="descriptionAr?.invalid && descriptionAr?.touched"></textarea>
-                                <div class="error-text" *ngIf="descriptionAr?.invalid && descriptionAr?.touched">
-                                    Arabic description is required
-                                </div>
+                                    placeholder="الوصف بالعربية" dir="rtl" rows="3"></textarea>
                             </div>
 
                             <!-- Description English -->
                             <div class="col-md-6 mb-3">
-                                <label for="descriptionEn" class="form-label">Description (English) <span
-                                        class="text-danger">*</span></label>
+                                <label for="descriptionEn" class="form-label">Description (English)</label>
                                 <textarea id="descriptionEn" class="form-control" formControlName="descriptionEn"
-                                    placeholder="English Description" rows="3"
-                                    [class.is-invalid]="descriptionEn?.invalid && descriptionEn?.touched"></textarea>
-                                <div class="error-text" *ngIf="descriptionEn?.invalid && descriptionEn?.touched">
-                                    English description is required
-                                </div>
+                                    placeholder="English Description" rows="3"></textarea>
                             </div>
                         </div>
 

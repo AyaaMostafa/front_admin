@@ -12,7 +12,7 @@ import { AlertComponent } from '../../shared/components/alert/alert.component';
 @Component({
     selector: 'app-code-type-main',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, AlertComponent],
     templateUrl: './code-type-main.component.html',
     styleUrl: './code-type-main.component.css'
 })
@@ -28,7 +28,7 @@ export class CodeTypeMainComponent implements OnInit {
     isLoading = false;
     errorMessage = '';
     successMessage = '';
-    codeTypeId!: number;
+    codeTypeId: number | null = null;
     codeAttributeTypeIds: number[] = [];
     isSidebarCollapsed = false;
 
@@ -50,15 +50,19 @@ export class CodeTypeMainComponent implements OnInit {
 
     ngOnInit() {
         const state = this.codeGeneratorService.getState();
-        this.codeTypeId = state.codeTypeId!;
-        this.codeAttributeTypeIds = state.codeAttributeTypeIds;
-
-        if (!this.codeTypeId || this.codeAttributeTypeIds.length === 0) {
-            this.errorMessage = 'Missing required data. Please complete previous steps.';
-            return;
-        }
+        this.codeTypeId = state.codeTypeId ?? null;
+        this.codeAttributeTypeIds = state.codeAttributeTypeIds || [];
 
         this.initForms();
+
+        if (this.codeTypeId) {
+            this.mainForm.patchValue({ codeTypeId: this.codeTypeId });
+        }
+
+        if (this.codeAttributeTypeIds.length > 0) {
+            this.mainForm.patchValue({ codeAttributeTypeId: this.codeAttributeTypeIds[0] });
+        }
+
         this.loadDropdownData();
     }
 
@@ -89,18 +93,18 @@ export class CodeTypeMainComponent implements OnInit {
             codeTypeId: ['', [Validators.required]],
             codeAttributeTypeId: ['', [Validators.required]],
             code: ['', [Validators.required, Validators.minLength(2)]],
-            nameAr: ['', [Validators.required]],
+            nameAr: [''],
             nameEn: ['', [Validators.required]],
-            descriptionAr: ['', [Validators.required]],
-            descriptionEn: ['', [Validators.required]]
+            descriptionAr: [''],
+            descriptionEn: ['']
         });
 
         this.detailForm = this.fb.group({
             code: ['', [Validators.required, Validators.minLength(2)]],
-            nameAr: ['', [Validators.required]],
+            nameAr: [''],
             nameEn: ['', [Validators.required]],
-            descriptionAr: ['', [Validators.required]],
-            descriptionEn: ['', [Validators.required]],
+            descriptionAr: [''],
+            descriptionEn: [''],
             sortOrder: [this.details.length + 1, [Validators.required]]
         });
     }
