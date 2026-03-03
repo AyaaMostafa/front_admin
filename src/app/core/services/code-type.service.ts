@@ -3,7 +3,24 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-export interface CodeTypeRequest {
+// ─── Interfaces ──────────────────────────────────────────────────────────────
+
+export interface CodeTypeItem {
+    id: number;
+    codeTypeCode: string;
+    nameAr: string;
+    nameEn: string;
+    descriptionAr: string;
+    descriptionEn: string;
+    isActive: boolean;
+    createdAt: string;
+    createdBy: string;
+    approvedAt: string | null;
+    approvedBy: string | null;
+}
+
+/** Body for POST /CodeTypes/Create */
+export interface CodeTypeCreateRequest {
     codeTypeCode: string;
     nameAr: string;
     nameEn: string;
@@ -11,42 +28,31 @@ export interface CodeTypeRequest {
     descriptionEn: string;
 }
 
+/** Body for PUT /CodeTypes/Update?id= */
+export interface CodeTypeUpdateRequest {
+    nameAr: string;
+    nameEn: string;
+    descriptionAr: string;
+    descriptionEn: string;
+    isActive: boolean;
+}
 
 export interface CodeTypeResponse {
     statusCode: number;
     message: string;
-    data: {
-        id: number;
-        codeTypeCode: string;
-        nameAr: string;
-        nameEn: string;
-        descriptionAr: string;
-        descriptionEn: string;
-        isActive: boolean;
-        createdAt: string;
-        createdBy: string;
-        approvedAt: string | null;
-        approvedBy: string | null;
-    };
+    data: CodeTypeItem;
 }
 
 export interface CodeTypeListResponse {
     statusCode: number;
     message: string;
-    data: {
-        id: number;
-        codeTypeCode: string;
-        nameAr: string;
-        nameEn: string;
-        descriptionAr: string;
-        descriptionEn: string;
-        isActive: boolean;
-        createdAt: string;
-        createdBy: string;
-        approvedAt: string | null;
-        approvedBy: string | null;
-    }[];
+    data: CodeTypeItem[];
 }
+
+// ─── Keep old name as alias so existing components don't break ────────────────
+export type CodeTypeRequest = CodeTypeCreateRequest;
+
+// ─── Service ─────────────────────────────────────────────────────────────────
 
 @Injectable({
     providedIn: 'root'
@@ -56,16 +62,26 @@ export class CodeTypeService {
 
     constructor(private http: HttpClient) { }
 
-    createCodeType(data: CodeTypeRequest): Observable<CodeTypeResponse> {
+    /** GET /CodeTypes/GetAll */
+    getAllCodeTypes(): Observable<CodeTypeListResponse> {
+        return this.http.get<CodeTypeListResponse>(
+            `${this.apiUrl}/CodeTypes/GetAll`
+        );
+    }
+
+    /** POST /CodeTypes/Create */
+    createCodeType(data: CodeTypeCreateRequest): Observable<CodeTypeResponse> {
         return this.http.post<CodeTypeResponse>(
             `${this.apiUrl}/CodeTypes/Create`,
             data
         );
     }
 
-    getAllCodeTypes(): Observable<CodeTypeListResponse> {
-        return this.http.get<CodeTypeListResponse>(
-            `${this.apiUrl}/CodeTypes/GetAll`
+    /** PUT /CodeTypes/Update?id={id} */
+    updateCodeType(id: number, data: CodeTypeUpdateRequest): Observable<CodeTypeResponse> {
+        return this.http.put<CodeTypeResponse>(
+            `${this.apiUrl}/CodeTypes/Update?id=${id}`,
+            data
         );
     }
 }

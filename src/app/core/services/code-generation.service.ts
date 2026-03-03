@@ -13,25 +13,35 @@ export interface CodeGenerationRequest {
     externalReferenceId: string;
 }
 
+export interface CodeItem {
+    id: number;
+    codeTypeId: number;
+    codeTypeCode: string;
+    codeTypeNameEn: string;
+    nameAr: string;
+    nameEn: string;
+    descriptionAr: string;
+    descriptionEn: string;
+    codeGenerated: string;
+    status: string;
+    externalSystem: string;
+    externalReferenceId: string;
+    createdBy: string;
+    createdAt: string;
+    approvedAt: string | null;
+    approvedBy: string | null;
+}
+
 export interface CodeGenerationResponse {
     statusCode: number;
     message: string;
-    data: {
-        id: number;
-        codeTypeId: number;
-        nameAr: string;
-        nameEn: string;
-        descriptionAr: string;
-        descriptionEn: string;
-        codeGenerated: string;
-        status: string;
-        externalSystem: string;
-        externalReferenceId: string;
-        createdBy: string;
-        createdAt: string;
-        approvedAt: string | null;
-        approvedBy: string | null;
-    };
+    data: CodeItem;
+}
+
+export interface CodesListResponse {
+    statusCode: number;
+    message: string;
+    data: CodeItem[];
 }
 
 @Injectable({
@@ -46,6 +56,12 @@ export class CodeGenerationService {
         return this.http.post<CodeGenerationResponse>(
             `${this.apiUrl}/Codes`,
             data
+        );
+    }
+
+    getAllCodes(): Observable<CodesListResponse> {
+        return this.http.get<CodesListResponse>(
+            `${this.apiUrl}/Codes`
         );
     }
 }

@@ -2,111 +2,126 @@
     <!-- Page Header -->
     <div class="page-header">
         <div>
-            <h2 class="main-content-title tx-24 mg-b-5">Code Details Configuration</h2>
+            <h2 class="main-content-title tx-24 mg-b-5">Code Detail Entry</h2>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="javascript:void(0)">Details</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Code Details</li>
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Settings</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Detail Entry</li>
             </ol>
         </div>
+        <a routerLink="/all-detail-entries" class="btn btn-outline-list">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <line x1="8" y1="6" x2="21" y2="6" />
+                <line x1="8" y1="12" x2="21" y2="12" />
+                <line x1="8" y1="18" x2="21" y2="18" />
+                <line x1="3" y1="6" x2="3.01" y2="6" />
+                <line x1="3" y1="12" x2="3.01" y2="12" />
+                <line x1="3" y1="18" x2="3.01" y2="18" />
+            </svg>
+            All Detail Entries
+        </a>
     </div>
 
-    <!-- Alert Messages -->
-    <app-alert *ngIf="successMessage" type="success" [message]="successMessage"></app-alert>
-    <app-alert *ngIf="errorMessage" type="error" [message]="errorMessage"></app-alert>
-
     <div class="content row row-sm">
-        <!-- Form Column -->
         <div class="col-lg-12 col-md-12">
+            <!-- Form Card -->
             <div class="card custom-card">
                 <div class="card-body">
-                    <h3 class="card-title">Add Detail Entry ({{ details.length }}/{{ attributeMainIds.length }})</h3>
-                    <p class="card-description">Configure specific detail entries for this code.</p>
+                    <h3 class="card-title">Add New Detail</h3>
+                    <p class="card-description">Specify details and add to your session list ({{ pendingDetails.length
+                        }} added)</p>
 
-                    <form [formGroup]="detailForm" (ngSubmit)="onSubmit()">
-                        <div class="row row-sm">
+                    <app-alert *ngIf="successMessage" type="success" [message]="successMessage"></app-alert>
+                    <app-alert *ngIf="errorMessage" type="error" [message]="errorMessage"></app-alert>
+
+                    @if (isLoadingMains) {
+                    <div class="skeleton-wrap">
+                        <div class="skeleton-field"></div>
+                    </div>
+                    } @else {
+                    <form [formGroup]="detailForm" (ngSubmit)="onAddDetail()" class="needs-validation" novalidate>
+                        <!-- Main Entry -->
+                        <div class="row">
                             <div class="col-md-12 mb-3">
-                                <label for="code" class="form-label">Code <span class="text-danger">*</span></label>
-                                <input type="text" id="code" formControlName="code" class="form-control"
-                                    [class.is-invalid]="code?.invalid && code?.touched"
-                                    placeholder="Enter unique code (e.g. D1)">
-                                <div *ngIf="code?.invalid && code?.touched" class="invalid-feedback">
-                                    <span *ngIf="code?.errors?.['required']">Code is required.</span>
-                                    <span *ngIf="code?.errors?.['minlength']">Minimum 2 characters.</span>
-                                </div>
+                                <label for="attributeMainId" class="form-label">Classification (Main Entry) <span
+                                        class="text-danger">*</span></label>
+                                <select id="attributeMainId" class="form-control" formControlName="attributeMainId"
+                                    [class.is-invalid]="attributeMainId?.invalid && attributeMainId?.touched">
+                                    <option [ngValue]="null">— Select Main Entry —</option>
+                                    @for (m of allMains; track m.id) {
+                                    <option [value]="m.id">{{ m.code }} — {{ m.nameEn }}</option>
+                                    }
+                                </select>
                             </div>
                         </div>
 
-                        <div class="row row-sm mt-3">
-                            <div class="col-md-6 mb-3">
-                                <label for="nameAr" class="form-label">Name (Arabic)</label>
-                                <input type="text" id="nameAr" formControlName="nameAr" class="form-control" dir="rtl"
-                                    placeholder="الاسم بالعربية">
+                        <!-- Code -->
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="detailCode" class="form-label">Code <span
+                                        class="text-danger">*</span></label>
+                                <input id="detailCode" type="text" class="form-control" formControlName="code"
+                                    placeholder="e.g. VISA, ADM, PHYS"
+                                    [class.is-invalid]="code?.invalid && code?.touched" />
                             </div>
+                        </div>
+
+                        <!-- Names -->
+                        <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="nameEn" class="form-label">Name (English) <span
                                         class="text-danger">*</span></label>
-                                <input type="text" id="nameEn" formControlName="nameEn" class="form-control"
-                                    [class.is-invalid]="nameEn?.invalid && nameEn?.touched">
-                            </div>
-                        </div>
-
-                        <div class="row row-sm mt-3">
-                            <div class="col-md-6 mb-3">
-                                <label for="descriptionAr" class="form-label">Description (Arabic)</label>
-                                <textarea id="descriptionAr" formControlName="descriptionAr" class="form-control"
-                                    rows="3" dir="rtl"></textarea>
+                                <input id="nameEn" type="text" class="form-control" formControlName="nameEn"
+                                    placeholder="English Name"
+                                    [class.is-invalid]="nameEn?.invalid && nameEn?.touched" />
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="descriptionEn" class="form-label">Description (English)</label>
-                                <textarea id="descriptionEn" formControlName="descriptionEn" class="form-control"
-                                    rows="3"></textarea>
+                                <label for="nameAr" class="form-label">Name (Arabic)</label>
+                                <input id="nameAr" type="text" class="form-control" formControlName="nameAr"
+                                    placeholder="الاسم بالعربية" dir="rtl" />
                             </div>
                         </div>
 
                         <div class="d-flex justify-content-end mt-4">
-                            <button type="submit" class="btn btn-primary-save px-5"
-                                [disabled]="detailForm.invalid || details.length >= attributeMainIds.length">
-                                <i class="fa fa-plus-circle me-1"></i> Add Detail to List
+                            <button type="submit" class="btn btn-primary-save">
+                                Add Detail
                             </button>
                         </div>
                     </form>
+                    }
                 </div>
             </div>
-        </div>
 
-        <!-- Details List Column -->
-        <div class="col-lg-12 col-md-12 mt-4" *ngIf="details.length > 0">
-            <div class="card custom-card">
+            <!-- Pending List -->
+            <div class="card custom-card attributes-list-card mt-4" *ngIf="pendingDetails.length > 0">
                 <div class="card-body">
-                    <h3 class="card-title">Added Detail Entries ({{ details.length }}/{{ attributeMainIds.length }})
-                    </h3>
-                    <p class="card-description">Review entries before final save.</p>
+                    <h3 class="card-title">Added Details ({{ pendingDetails.length }})</h3>
+                    <p class="card-description">Review before saving to database</p>
 
                     <div class="attributes-items-container">
-                        @for (detail of details; track $index) {
+                        @for (item of pendingDetails; track $index) {
                         <div class="attribute-item">
                             <div class="attribute-header">
-                                <h4>Detail Entry #{{ $index + 1 }}</h4>
-                                <button type="button" class="btn btn-danger-delete btn-sm"
-                                    (click)="removeDetail($index)" [disabled]="isLoading">
-                                    ✕ Remove
+                                <h4>Detail #{{ $index + 1 }} - {{ item.code }}</h4>
+                                <button type="button" class="btn btn-danger-delete" (click)="removePending($index)">
+                                    <i class="fa fa-trash me-1"></i> Remove
                                 </button>
                             </div>
                             <div class="attribute-details">
                                 <div class="detail-row">
-                                    <div class="detail-item w-100">
-                                        <strong>Code</strong>
-                                        <span>{{ detail.code }}</span>
+                                    <div class="detail-item">
+                                        <strong>Main Entry</strong>
+                                        <span>{{ item.mainLabel }}</span>
                                     </div>
                                 </div>
                                 <div class="detail-row mt-3">
                                     <div class="detail-item">
-                                        <strong>Name (AR)</strong>
-                                        <span>{{ detail.nameAr }}</span>
+                                        <strong>Name (English)</strong>
+                                        <span>{{ item.nameEn }}</span>
                                     </div>
                                     <div class="detail-item">
-                                        <strong>Name (EN)</strong>
-                                        <span>{{ detail.nameEn }}</span>
+                                        <strong>Name (Arabic)</strong>
+                                        <span dir="rtl">{{ item.nameAr }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -114,14 +129,14 @@
                         }
                     </div>
 
-                    <div class="d-flex justify-content-center mt-4">
-                        <button type="button" class="btn btn-primary-save btn-lg px-5" (click)="saveAllDetails()"
-                            [disabled]="isLoading || details.length !== attributeMainIds.length">
-                            @if (isLoading) {
+                    <div class="d-flex justify-content-center mt-5">
+                        <button type="button" class="btn btn-primary-save btn-lg px-5" (click)="saveAllAndContinue()"
+                            [disabled]="isSaving">
+                            @if (isSaving) {
                             <span class="spinner-border spinner-border-sm me-1"></span>
-                            Saving All Details...
+                            Saving All...
                             } @else {
-                            Save All & Continue <i class="fa fa-arrow-right ms-2"></i>
+                            Save All & Continue to Settings
                             }
                         </button>
                     </div>

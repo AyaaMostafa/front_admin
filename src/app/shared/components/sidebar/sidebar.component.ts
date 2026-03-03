@@ -34,17 +34,57 @@ export class SidebarComponent {
                 {
                     label: 'Code Type',
                     icon: 'grid',
-                    expanded: true,
+                    expanded: false,
                     children: [
                         { label: 'All Code Types', icon: '', route: '/all-code-types' },
                         { label: 'Create New', icon: '', route: '/code-type' }
                     ]
                 },
-                { label: 'Type Attribute', icon: 'layers', route: '/code-type-attribute' },
-                { label: 'Main Entries', icon: 'box', route: '/code-type-main' },
-                { label: 'Settings', icon: 'settings', route: '/code-settings' },
-                { label: 'Sequence', icon: 'bar-chart', route: '/code-sequence' },
-                { label: 'Generation', icon: 'file-text', route: '/code-generation' }
+                {
+                    label: 'Attribute Type',
+                    icon: 'layers',
+                    expanded: false,
+                    children: [
+                        { label: 'All Attribute Types', icon: '', route: '/all-attribute-types' },
+                        { label: 'Create New', icon: '', route: '/code-type-attribute' }
+                    ]
+                },
+                {
+                    label: 'Main Entry',
+                    icon: 'box',
+                    expanded: false,
+                    children: [
+                        { label: 'All Main Entries', icon: '', route: '/all-main-entries' },
+                        { label: 'Create New', icon: '', route: '/code-type-main' }
+                    ]
+                },
+                {
+                    label: 'Code Detail',
+                    icon: 'file',
+                    expanded: false,
+                    children: [
+                        { label: 'Create New', icon: '', route: '/code-details' }
+                    ]
+                },
+                {
+                    label: 'Settings',
+                    icon: 'settings',
+                    route: '/code-settings'
+                },
+                {
+                    label: 'Sequence',
+                    icon: 'bar-chart',
+                    route: '/code-sequence'
+                },
+                {
+                    label: 'Generation',
+                    icon: 'file-text',
+                    expanded: false,
+                    children: [
+                        { label: 'All Codes', icon: '', route: '/all-codes' },
+                        { label: 'Generate New', icon: '', route: '/code-generation' }
+                    ]
+                }
             ]
         }
     ]);

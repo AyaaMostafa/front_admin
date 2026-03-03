@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { CodeAttributeMainService } from '../../core/services/code-attribute-main.service';
-import { CodeAttributeDetailService } from '../../core/services/code-attribute-detail.service';
-import { CodeGeneratorService } from '../../core/services/code-generator.service';
 import { CodeTypeService } from '../../core/services/code-type.service';
 import { CodeAttributeTypeService } from '../../core/services/code-attribute-type.service';
 import { AlertComponent } from '../../shared/components/alert/alert.component';
@@ -12,286 +10,144 @@ import { AlertComponent } from '../../shared/components/alert/alert.component';
 @Component({
     selector: 'app-code-type-main',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, AlertComponent],
+    imports: [CommonModule, ReactiveFormsModule, RouterLink, AlertComponent],
     templateUrl: './code-type-main.component.html',
     styleUrl: './code-type-main.component.css'
 })
 export class CodeTypeMainComponent implements OnInit {
+
     mainForm!: FormGroup;
-    mains: any[] = [];
-    savedMainIds: number[] = [];
-
-    detailForm!: FormGroup;
-    details: any[] = [];
-    savedDetailIds: number[] = [];
-
-    isLoading = false;
+    isSaving = false;
     errorMessage = '';
     successMessage = '';
-    codeTypeId: number | null = null;
-    codeAttributeTypeIds: number[] = [];
-    isSidebarCollapsed = false;
-
-    mainsSaved = false;
 
     // Dropdown data
     codeTypes: any[] = [];
     codeAttributeTypes: any[] = [];
+    isLoadingData = true;
+
+    // Local accumulation list
+    pendingMains: any[] = [];
 
     constructor(
         private fb: FormBuilder,
         private codeAttributeMainService: CodeAttributeMainService,
-        private codeAttributeDetailService: CodeAttributeDetailService,
-        private codeGeneratorService: CodeGeneratorService,
         private codeTypeService: CodeTypeService,
         private codeAttributeTypeService: CodeAttributeTypeService,
         private router: Router
     ) { }
 
-    ngOnInit() {
-        const state = this.codeGeneratorService.getState();
-        this.codeTypeId = state.codeTypeId ?? null;
-        this.codeAttributeTypeIds = state.codeAttributeTypeIds || [];
-
-        this.initForms();
-
-        if (this.codeTypeId) {
-            this.mainForm.patchValue({ codeTypeId: this.codeTypeId });
-        }
-
-        if (this.codeAttributeTypeIds.length > 0) {
-            this.mainForm.patchValue({ codeAttributeTypeId: this.codeAttributeTypeIds[0] });
-        }
-
+    ngOnInit(): void {
+        this.initForm();
         this.loadDropdownData();
     }
 
-    loadDropdownData() {
-        // Load Code Types
+    loadDropdownData(): void {
+        let loaded = 0;
+        const done = () => { if (++loaded >= 2) this.isLoadingData = false; };
+
         this.codeTypeService.getAllCodeTypes().subscribe({
-            next: (response) => {
-                this.codeTypes = response.data;
-            },
-            error: (error) => {
-                console.error('Error loading code types:', error);
-            }
+            next: (res) => { this.codeTypes = res.data; done(); },
+            error: () => done()
         });
 
-        // Load Code Attribute Types
         this.codeAttributeTypeService.getAllCodeAttributeTypes().subscribe({
-            next: (response) => {
-                this.codeAttributeTypes = response.data;
-            },
-            error: (error) => {
-                console.error('Error loading code attribute types:', error);
-            }
+            next: (res) => { this.codeAttributeTypes = res.data; done(); },
+            error: () => done()
         });
     }
 
-    initForms() {
+    initForm(): void {
         this.mainForm = this.fb.group({
-            codeTypeId: ['', [Validators.required]],
-            codeAttributeTypeId: ['', [Validators.required]],
+            codeTypeId: ['', Validators.required],
+            codeAttributeTypeId: ['', Validators.required],
             code: ['', [Validators.required, Validators.minLength(2)]],
             nameAr: [''],
-            nameEn: ['', [Validators.required]],
+            nameEn: ['', Validators.required],
             descriptionAr: [''],
             descriptionEn: ['']
         });
-
-        this.detailForm = this.fb.group({
-            code: ['', [Validators.required, Validators.minLength(2)]],
-            nameAr: [''],
-            nameEn: ['', [Validators.required]],
-            descriptionAr: [''],
-            descriptionEn: [''],
-            sortOrder: [this.details.length + 1, [Validators.required]]
-        });
     }
 
-    onSubmitMain() {
-        if (this.mainForm.valid) {
-            this.addMain();
-        } else {
-            Object.keys(this.mainForm.controls).forEach(key => {
-                this.mainForm.get(key)?.markAsTouched();
-            });
-        }
-    }
-
-    addMain() {
-        if (this.mainForm.valid) {
-            this.mains.push({ ...this.mainForm.value });
-            this.successMessage = `Main added! Total: ${this.mains.length}`;
-            this.mainForm.reset();
-            this.errorMessage = '';
-
-            setTimeout(() => {
-                this.successMessage = '';
-            }, 2000);
-        }
-    }
-
-    removeMain(index: number) {
-        this.mains.splice(index, 1);
-        this.successMessage = `Main removed! Total: ${this.mains.length}`;
-
-        setTimeout(() => {
-            this.successMessage = '';
-        }, 2000);
-    }
-
-    saveAllMains() {
-        if (this.mains.length === 0) {
-            this.errorMessage = 'Please add at least one main entry before saving.';
+    onAddEntry(): void {
+        if (this.mainForm.invalid) {
+            this.mainForm.markAllAsTouched();
             return;
         }
 
-        this.isLoading = true;
+        const fv = this.mainForm.value;
+        const ct = this.codeTypes.find(c => c.id == fv.codeTypeId);
+        const at = this.codeAttributeTypes.find(a => a.id == fv.codeAttributeTypeId);
+
+        this.pendingMains.push({
+            ...fv,
+            codeTypeLabel: ct ? `${ct.codeTypeCode} — ${ct.nameEn}` : `#${fv.codeTypeId}`,
+            attrTypeLabel: at ? at.nameEn : `#${fv.codeAttributeTypeId}`
+        });
+
+        this.successMessage = `✓ Entry "${fv.code}" added to list.`;
+
+        // Reset code/names but keep types
+        this.mainForm.patchValue({
+            code: '',
+            nameAr: '',
+            nameEn: '',
+            descriptionAr: '',
+            descriptionEn: ''
+        });
+        this.mainForm.get('code')?.setErrors(null);
+        this.mainForm.get('nameEn')?.setErrors(null);
+
+        setTimeout(() => this.successMessage = '', 2000);
+    }
+
+    removePending(index: number): void {
+        this.pendingMains.splice(index, 1);
+    }
+
+    saveAllAndContinue(): void {
+        if (this.pendingMains.length === 0) {
+            this.errorMessage = 'Please add at least one entry before continuing.';
+            return;
+        }
+
+        this.isSaving = true;
         this.errorMessage = '';
         this.successMessage = '';
 
-        // Prepare bulk data - array of all main entries
-        const bulkData = this.mains.map(main => ({
-            code: main.code,
-            nameAr: main.nameAr,
-            nameEn: main.nameEn,
-            descriptionAr: main.descriptionAr,
-            descriptionEn: main.descriptionEn,
-            codeTypeId: main.codeTypeId,
-            codeAttributeTypeId: main.codeAttributeTypeId
-        }));
+        let completed = 0;
+        const total = this.pendingMains.length;
 
-        // Single bulk API call
-        this.codeAttributeMainService.createCodeAttributeMainsBulk(bulkData).subscribe({
-            next: (response) => {
-                // Extract all IDs from the response
-                this.savedMainIds = response.data.map(item => item.id);
-
-                // Add all IDs to code generator service
-                response.data.forEach(item => {
-                    this.codeGeneratorService.addCodeAttributeMainId(item.id);
-                });
-
-                this.isLoading = false;
-                this.successMessage = `All ${response.data.length} mains saved successfully! Now you can add details below.`;
-                this.mainsSaved = true;
-
-                setTimeout(() => {
-                    document.getElementById('details-section')?.scrollIntoView({ behavior: 'smooth' });
-                }, 1000);
-            },
-            error: (error) => {
-                this.isLoading = false;
-                this.errorMessage = error.error?.message || 'Failed to save mains. Please try again.';
-            }
-        });
-    }
-
-    onSubmitDetail() {
-        if (this.detailForm.valid) {
-            this.addDetail();
-        } else {
-            Object.keys(this.detailForm.controls).forEach(key => {
-                this.detailForm.get(key)?.markAsTouched();
-            });
-        }
-    }
-
-    addDetail() {
-        if (this.detailForm.valid) {
-            this.details.push({ ...this.detailForm.value });
-            this.successMessage = `Detail added! Total: ${this.details.length}`;
-            this.detailForm.reset();
-            this.detailForm.patchValue({ sortOrder: this.details.length + 1 });
-            this.errorMessage = '';
-
-            setTimeout(() => {
-                this.successMessage = '';
-            }, 2000);
-        }
-    }
-
-    removeDetail(index: number) {
-        this.details.splice(index, 1);
-        this.details.forEach((detail, idx) => {
-            detail.sortOrder = idx + 1;
-        });
-        this.detailForm.patchValue({ sortOrder: this.details.length + 1 });
-        this.successMessage = `Detail removed! Total: ${this.details.length}`;
-
-        setTimeout(() => {
-            this.successMessage = '';
-        }, 2000);
-    }
-
-    saveAllDetails() {
-        if (this.details.length === 0) {
-            this.errorMessage = 'Please add at least one detail entry before saving.';
-            return;
-        }
-
-        if (this.savedMainIds.length === 0) {
-            this.errorMessage = 'No main entries found. Please save main entries first.';
-            return;
-        }
-
-        this.isLoading = true;
-        this.errorMessage = '';
-        this.successMessage = '';
-
-        // Prepare bulk data - array of all detail entries
-        const bulkData = this.details.map((detail, index) => {
-            // Cycle through savedMainIds if there are more details than mains
-            const mainIdIndex = index % this.savedMainIds.length;
-            return {
-                ...detail,
-                attributeMainId: this.savedMainIds[mainIdIndex]
+        this.pendingMains.forEach((entry, index) => {
+            const payload = {
+                codeTypeId: +entry.codeTypeId,
+                codeAttributeTypeId: +entry.codeAttributeTypeId,
+                code: entry.code,
+                nameAr: entry.nameAr || '',
+                nameEn: entry.nameEn,
+                descriptionAr: entry.descriptionAr || '',
+                descriptionEn: entry.descriptionEn || ''
             };
-        });
 
-        // Single bulk API call
-        this.codeAttributeDetailService.createCodeAttributeDetailsBulk(bulkData).subscribe({
-            next: (response) => {
-                // Extract all IDs from the response
-                this.savedDetailIds = response.data.map(item => item.id);
-
-                // Add all IDs to code generator service
-                response.data.forEach(item => {
-                    this.codeGeneratorService.addCodeAttributeDetailId(item.id);
-                });
-
-                this.isLoading = false;
-                this.successMessage = `All ${response.data.length} details saved successfully!`;
-                this.codeGeneratorService.completeStep(2);
-
-                setTimeout(() => {
-                    this.router.navigate(['/code-settings']);
-                }, 1500);
-            },
-            error: (error) => {
-                this.isLoading = false;
-                this.errorMessage = error.error?.message || 'Failed to save details. Please try again.';
-            }
+            this.codeAttributeMainService.createCodeAttributeMain(payload).subscribe({
+                next: () => {
+                    completed++;
+                    if (completed === total) {
+                        this.isSaving = false;
+                        this.successMessage = `All ${total} entries saved! Moving to Details...`;
+                        setTimeout(() => this.router.navigate(['/code-details']), 1500);
+                    }
+                },
+                error: (err) => {
+                    this.isSaving = false;
+                    this.errorMessage = err.error?.message || `Failed to save entry ${index + 1}.`;
+                }
+            });
         });
     }
 
-    toggleSidebar(): void {
-        this.isSidebarCollapsed = !this.isSidebarCollapsed;
-    }
-
-    get mainCodeTypeId() { return this.mainForm.get('codeTypeId'); }
-    get mainCodeAttributeTypeId() { return this.mainForm.get('codeAttributeTypeId'); }
-    get mainCode() { return this.mainForm.get('code'); }
-    get mainNameAr() { return this.mainForm.get('nameAr'); }
-    get mainNameEn() { return this.mainForm.get('nameEn'); }
-    get mainDescriptionAr() { return this.mainForm.get('descriptionAr'); }
-    get mainDescriptionEn() { return this.mainForm.get('descriptionEn'); }
-
-    get detailCode() { return this.detailForm.get('code'); }
-    get detailNameAr() { return this.detailForm.get('nameAr'); }
-    get detailNameEn() { return this.detailForm.get('nameEn'); }
-    get detailDescriptionAr() { return this.detailForm.get('descriptionAr'); }
-    get detailDescriptionEn() { return this.detailForm.get('descriptionEn'); }
-    get sortOrder() { return this.detailForm.get('sortOrder'); }
+    get codeTypeId() { return this.mainForm.get('codeTypeId'); }
+    get codeAttributeTypeId() { return this.mainForm.get('codeAttributeTypeId'); }
+    get code() { return this.mainForm.get('code'); }
+    get nameEn() { return this.mainForm.get('nameEn'); }
 }

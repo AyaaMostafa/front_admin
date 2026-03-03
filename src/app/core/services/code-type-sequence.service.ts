@@ -9,24 +9,25 @@ export interface CodeTypeSequenceRequest {
     startWith: number;
     minValue: number;
     maxValue: number;
+    cycling: number;
+}
+
+export interface CodeTypeSequenceData {
+    id: number;
+    nameEn: string;
+    codeTypeId: number;
+    startWith: number;
+    minValue: number;
+    maxValue: number;
     currentValue: number;
-    isCycling: number;
+    cycling: number;
+    createdAt: string;
 }
 
 export interface CodeTypeSequenceResponse {
     statusCode: number;
     message: string;
-    data: {
-        id: number;
-        nameEn: string;
-        codeTypeId: number;
-        startWith: number;
-        minValue: number;
-        maxValue: number;
-        currentValue: number;
-        isCycling: number;
-        createdAt: string;
-    };
+    data: CodeTypeSequenceData;
 }
 
 @Injectable({

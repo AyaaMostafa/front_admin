@@ -38,7 +38,7 @@ export class LoginComponent {
             this.isLoading.set(true);
             this.errorMessage.set(null);
 
-            this.authService.login(this.loginForm.value).subscribe({
+            this.authService.loginWithCredentials(this.loginForm.value).subscribe({
                 next: (response) => {
                     if (response.success) {
                         this.router.navigate([ROUTES.DASHBOARD]);

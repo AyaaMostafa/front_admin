@@ -6,6 +6,29 @@ import { environment } from '../../../environments/environment';
 import { User, LoginResponse, LoginCredentials, RegisterData } from '../models';
 import { STORAGE_KEYS, API_ENDPOINTS, ROUTES } from '../constants';
 
+// Response shape from POST /Auth/validate-token
+interface ValidateTokenResponse {
+    success: boolean;
+    message: string;
+    data: {
+        token: string;          // the validated token (use this for storage)
+        userCode: string;
+        employeeName: string;
+        roles: string[];
+        permissions: string[];
+        expiresOn: string;
+        genderId?: number;      // optional — not always returned
+    };
+}
+
+// Response shape from GET /Auth/check-token
+interface CheckTokenResponse {
+    success: boolean;
+    isTokenValid: boolean;
+    expiresOn: string;
+    message: string;
+}
+
 /**
  * Utility function to safely access localStorage
  */
@@ -58,9 +81,13 @@ export class AuthService {
     }
 
     /**
-     * Login user with credentials
+     * Simple login that just stores the token.
+     * Use loginWithToken for a full session initialization with whoami.
      */
-    login(credentials: LoginCredentials): Observable<LoginResponse> {
+    login(token: string): void {
+        safeLocalStorageSetItem(STORAGE_KEYS.TOKEN, token);
+    }
+    loginWithCredentials(credentials: LoginCredentials): Observable<LoginResponse> {
         return this.http.post<LoginResponse>(
             `${this.apiUrl}${API_ENDPOINTS.AUTH.LOGIN}`,
             credentials
@@ -72,6 +99,59 @@ export class AuthService {
             }),
             catchError(error => this.handleAuthError(error))
         );
+    }
+
+    /**
+     * Validate a raw JWT token against the backend and create a session.
+     * Used for SSO: the administrative project passes its token via URL.
+     */
+    loginWithToken(token: string): Observable<boolean> {
+        // Store the token immediately so interceptor can use it for subsequent calls
+        safeLocalStorageSetItem(STORAGE_KEYS.TOKEN, token);
+
+        return this.getWhoAmI().pipe(
+            map(response => {
+                if (response.success && response.data) {
+                    const user: User = {
+                        userCode: response.data.userCode,
+                        employeeName: response.data.employeeName || '',
+                        roles: response.data.roles,
+                        permissions: response.data.permissions,
+                        genderId: 0, // Not provided by whoami usually
+                        token: token,
+                        expiresOn: '' // We might need to decode JWT to get this if not provided
+                    };
+
+                    safeLocalStorageSetItem(STORAGE_KEYS.USER, JSON.stringify(user));
+                    this.currentUserSubject.next(user);
+                    return true;
+                }
+                this.clearAuthData();
+                return false;
+            }),
+            catchError(error => {
+                console.error('[AuthService] loginWithToken failed:', error);
+                this.clearAuthData();
+                return throwError(() => error);
+            })
+        );
+    }
+
+    /**
+     * Get information about the currently logged-in user.
+     * GET /Auth/whoami
+     */
+    getWhoAmI(): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}${API_ENDPOINTS.AUTH.WHOAMI}`);
+    }
+
+    /**
+     * Check if the currently stored token is still valid on the server.
+     * GET /Auth/check-token — the auth interceptor sends the Bearer header automatically.
+     * Use this for server-side session validation (more reliable than client-side expiry check).
+     */
+    checkToken(): Observable<CheckTokenResponse> {
+        return this.http.get<CheckTokenResponse>(`${this.apiUrl}/Auth/check-token`);
     }
 
     /**
@@ -92,7 +172,7 @@ export class AuthService {
     logout(): void {
         this.clearAuthData();
         this.currentUserSubject.next(null);
-        this.router.navigate([ROUTES.AUTH.LOGIN]);
+        window.location.href = '/';
     }
 
     /**

@@ -2,21 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CodeTypeService } from '../../core/services/code-type.service';
-
-interface CodeTypeItem {
-    id: number;
-    codeTypeCode: string;
-    nameAr: string;
-    nameEn: string;
-    descriptionAr: string;
-    descriptionEn: string;
-    isActive: boolean;
-    createdAt: string;
-    createdBy: string;
-    approvedAt: string | null;
-    approvedBy: string | null;
-}
+import { CodeTypeService, CodeTypeItem } from '../../core/services/code-type.service';
 
 @Component({
     selector: 'app-code-type-list',
@@ -31,13 +17,9 @@ export class CodeTypeListComponent implements OnInit {
     isLoading = false;
     errorMessage = '';
 
-    // Filter state
+    // ── Filter ────────────────────────────────────────────────────────────────
     showFilter = false;
-    filterRequest = {
-        nameEn: '',
-        nameAr: '',
-        approvedBy: ''
-    };
+    filterRequest = { nameEn: '', nameAr: '' };
 
     constructor(
         private codeTypeService: CodeTypeService,
@@ -47,6 +29,8 @@ export class CodeTypeListComponent implements OnInit {
     ngOnInit(): void {
         this.loadCodeTypes();
     }
+
+    // ── Load ──────────────────────────────────────────────────────────────────
 
     loadCodeTypes(): void {
         this.isLoading = true;
@@ -64,33 +48,36 @@ export class CodeTypeListComponent implements OnInit {
         });
     }
 
-    toggleFilter(): void {
-        this.showFilter = !this.showFilter;
-    }
+    // ── Filter ────────────────────────────────────────────────────────────────
+
+    toggleFilter(): void { this.showFilter = !this.showFilter; }
 
     applyFilter(): void {
         const nameEn = this.filterRequest.nameEn.toLowerCase().trim();
         const nameAr = this.filterRequest.nameAr.trim();
-        const approvedBy = this.filterRequest.approvedBy.toLowerCase().trim();
-
         this.filteredCodeTypes = this.codeTypes.filter(item => {
             const matchesNameEn = nameEn ? item.nameEn.toLowerCase().includes(nameEn) : true;
             const matchesNameAr = nameAr ? item.nameAr.includes(nameAr) : true;
-            const matchesApprovedBy = approvedBy
-                ? (item.approvedBy ?? '').toLowerCase().includes(approvedBy)
-                : true;
-            return matchesNameEn && matchesNameAr && matchesApprovedBy;
+            return matchesNameEn && matchesNameAr;
         });
     }
 
     resetFilter(): void {
-        this.filterRequest = { nameEn: '', nameAr: '', approvedBy: '' };
+        this.filterRequest = { nameEn: '', nameAr: '' };
         this.filteredCodeTypes = [...this.codeTypes];
     }
+
+    // ── Navigation ────────────────────────────────────────────────────────────
 
     navigateToAdd(): void {
         this.router.navigate(['/code-type']);
     }
+
+    navigateToEdit(item: CodeTypeItem): void {
+        this.router.navigate(['/update-code-type', item.id]);
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
 
     formatDate(dateStr: string | null): string {
         if (!dateStr) return '—';

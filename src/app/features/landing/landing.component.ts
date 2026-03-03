@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
+import { AuthService } from '../../core/services';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   template: `
     <div class="landing-container">
 
@@ -25,6 +26,12 @@ import { RouterLink } from '@angular/router';
             </svg>
           </div>
           <span class="logo-text">CodeGen</span>
+        </div>
+
+        <!-- User chip shown when authenticated -->
+        <div class="nav-user" *ngIf="user">
+          <div class="user-avatar">{{ userInitial }}</div>
+          <span class="user-name">{{ user.userCode }}</span>
         </div>
       </nav>
 
@@ -46,14 +53,37 @@ import { RouterLink } from '@angular/router';
           type management, and intelligent sequencing — all in one place.
         </p>
 
-        <a routerLink="/auth/login" class="btn-login">
+        <!-- Go to Dashboard button -->
+        <button class="btn-dashboard" (click)="goToDashboard()" id="go-to-dashboard-btn">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-            <polyline points="10 17 15 12 10 7"></polyline>
-            <line x1="15" y1="12" x2="3" y2="12"></line>
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
           </svg>
-          Sign In to Dashboard
-        </a>
+          Go to Dashboard
+          <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+
+        <!-- Feature chips -->
+        <div class="feature-chips">
+          <span class="chip">
+            <span class="chip-dot"></span> Code Types
+          </span>
+          <span class="chip">
+            <span class="chip-dot"></span> Attributes
+          </span>
+          <span class="chip">
+            <span class="chip-dot"></span> Sequences
+          </span>
+          <span class="chip">
+            <span class="chip-dot"></span> Generation
+          </span>
+        </div>
       </main>
 
     </div>
@@ -85,29 +115,23 @@ import { RouterLink } from '@angular/router';
     }
 
     .blob-1 {
-      width: 480px;
-      height: 480px;
+      width: 480px; height: 480px;
       background: rgba(65, 205, 183, 0.22);
-      top: -100px;
-      right: -80px;
+      top: -100px; right: -80px;
       animation: blob-drift 10s ease-in-out infinite;
     }
 
     .blob-2 {
-      width: 320px;
-      height: 320px;
+      width: 320px; height: 320px;
       background: rgba(65, 205, 183, 0.12);
-      bottom: 100px;
-      left: -80px;
+      bottom: 100px; left: -80px;
       animation: blob-drift 14s ease-in-out infinite reverse;
     }
 
     .blob-3 {
-      width: 220px;
-      height: 220px;
+      width: 220px; height: 220px;
       background: rgba(43, 168, 154, 0.1);
-      top: 50%;
-      left: 30%;
+      top: 50%; left: 30%;
       animation: blob-drift 18s ease-in-out infinite;
     }
 
@@ -123,7 +147,7 @@ import { RouterLink } from '@angular/router';
       max-width: 1100px;
       display: flex;
       align-items: center;
-      justify-content: flex-start;
+      justify-content: space-between;
       padding: 1.75rem 0;
       position: relative;
       z-index: 10;
@@ -136,13 +160,10 @@ import { RouterLink } from '@angular/router';
     }
 
     .logo-mark {
-      width: 40px;
-      height: 40px;
+      width: 40px; height: 40px;
       background: linear-gradient(135deg, #41CDB7, #2ba89a);
       border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       color: white;
       box-shadow: 0 4px 14px rgba(65, 205, 183, 0.35);
     }
@@ -151,6 +172,34 @@ import { RouterLink } from '@angular/router';
       font-size: 1.2rem;
       font-weight: 800;
       color: #1a202c;
+    }
+
+    /* User chip */
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: rgba(65, 205, 183, 0.12);
+      border: 1px solid rgba(65, 205, 183, 0.3);
+      border-radius: 50px;
+      padding: 0.35rem 0.9rem 0.35rem 0.35rem;
+    }
+
+    .user-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #41CDB7, #2ba89a);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      text-transform: uppercase;
+    }
+
+    .user-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #2ba89a;
     }
 
     /* ── Hero ── */
@@ -184,8 +233,7 @@ import { RouterLink } from '@angular/router';
     }
 
     .badge-dot {
-      width: 7px;
-      height: 7px;
+      width: 7px; height: 7px;
       border-radius: 50%;
       background: #41CDB7;
       animation: pulse-dot 2s ease-in-out infinite;
@@ -214,9 +262,7 @@ import { RouterLink } from '@angular/router';
     .hero-highlight::after {
       content: '';
       position: absolute;
-      bottom: 4px;
-      left: 0;
-      right: 0;
+      bottom: 4px; left: 0; right: 0;
       height: 4px;
       background: linear-gradient(90deg, #41CDB7, #2ba89a);
       border-radius: 4px;
@@ -231,11 +277,11 @@ import { RouterLink } from '@angular/router';
       max-width: 560px;
     }
 
-    /* Single Login Button */
-    .btn-login {
+    /* ── Dashboard Button ── */
+    .btn-dashboard {
       display: inline-flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.65rem;
       padding: 1rem 2.25rem;
       background: linear-gradient(135deg, #41CDB7 0%, #2ba89a 100%);
       color: #ffffff;
@@ -244,27 +290,82 @@ import { RouterLink } from '@angular/router';
       font-weight: 700;
       font-family: 'Inter', sans-serif;
       border-radius: 12px;
+      border: none;
+      cursor: pointer;
       box-shadow: 0 8px 24px rgba(65, 205, 183, 0.4);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, gap 0.2s ease;
       letter-spacing: 0.1px;
     }
 
-    .btn-login:hover {
+    .btn-dashboard:hover {
       transform: translateY(-3px);
       box-shadow: 0 14px 32px rgba(65, 205, 183, 0.55);
+      gap: 0.9rem;
     }
 
-    .btn-login:active {
+    .btn-dashboard:active {
       transform: translateY(0);
       box-shadow: 0 6px 16px rgba(65, 205, 183, 0.35);
+    }
+
+    .arrow-icon {
+      transition: transform 0.2s ease;
+    }
+
+    .btn-dashboard:hover .arrow-icon {
+      transform: translateX(4px);
+    }
+
+    /* ── Feature Chips ── */
+    .feature-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      justify-content: center;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.8rem;
+      background: #fff;
+      border: 1px solid rgba(65, 205, 183, 0.25);
+      border-radius: 50px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #4a5568;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+
+    .chip-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #41CDB7;
     }
 
     /* ── Responsive ── */
     @media (max-width: 768px) {
       .hero-title { font-size: 2.2rem; }
       .hero-desc  { font-size: 1rem; }
-      .btn-login  { padding: 0.9rem 1.75rem; font-size: 0.95rem; }
+      .btn-dashboard { padding: 0.9rem 1.75rem; font-size: 0.95rem; }
+      .landing-nav { flex-direction: column; align-items: flex-start; gap: 1rem; }
     }
   `]
 })
-export class LandingComponent { }
+export class LandingComponent {
+  user: any = null;
+  userInitial = '?';
+
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {
+    this.user = this.authService.currentUser();
+    this.userInitial = this.user?.userCode?.charAt(0)?.toUpperCase() || '?';
+  }
+
+  goToDashboard(): void {
+    this.router.navigate(['/dashboard']);
+  }
+}

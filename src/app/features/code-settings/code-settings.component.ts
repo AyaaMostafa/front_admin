@@ -1,228 +1,173 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { CodeTypeSettingService } from '../../core/services/code-type-setting.service';
-import { CodeGeneratorService } from '../../core/services/code-generator.service';
 import { CodeTypeService } from '../../core/services/code-type.service';
-import { CodeAttributeDetailService } from '../../core/services/code-attribute-detail.service';
-import { forkJoin } from 'rxjs';
-import { AlertComponent } from '../../shared/components/alert/alert.component';
+import { CodeAttributeDetailService, CodeAttributeDetailItem } from '../../core/services/code-attribute-detail.service';
 
-interface SettingDisplay {
-    id?: number;
-    code: string;
-    codeTypeId: number;
-    attributeDetailId: number;
-    sortOrder: number;
+
+interface SavedSetting {
+    id: number;
+    codeTypeLabel: string;
+    detailLabel: string;
     separator: string;
+    sortOrder: number;
     isRequired: boolean;
 }
+
+import { AlertComponent } from '../../shared/components/alert/alert.component';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-code-settings',
     standalone: true,
-    imports: [CommonModule, AlertComponent, FormsModule],
+    imports: [CommonModule, FormsModule, AlertComponent],
     templateUrl: './code-settings.component.html',
     styleUrl: './code-settings.component.css'
 })
 export class CodeSettingsComponent implements OnInit {
-    settings: SettingDisplay[] = [];
-    savedSettingIds: number[] = [];
 
+    // Dropdown data
+    codeTypes: any[] = [];
+    codeAttributeDetails: CodeAttributeDetailItem[] = [];
+    isLoadingData = true;
 
-    isLoading = false;
+    // Selections
+    selectedCodeTypeId: number | null = null;
+    selectedAttributeDetailId: number | null = null;
+    separator = '-';
+    sortOrder = 1;
+    isRequired = true;
+
+    // State
+    isSaving = false;
     errorMessage = '';
     successMessage = '';
 
-    codeTypes: any[] = [];
-    codeAttributeDetails: any[] = [];
-
-    selectedCodeTypeId: number | null = null;
-    selectedAttributeDetailId: number | null = null;
-
-    onSelectionChange() {
-        if (this.selectedCodeTypeId && this.selectedAttributeDetailId) {
-            const alreadyExists = this.settings.some(s =>
-                s.codeTypeId === this.selectedCodeTypeId &&
-                s.attributeDetailId === this.selectedAttributeDetailId
-            );
-
-            if (!alreadyExists) {
-                const detail = this.codeAttributeDetails.find(d => d.id === this.selectedAttributeDetailId);
-                this.settings.push({
-                    code: detail ? detail.code : `DETAIL-${this.selectedAttributeDetailId}`,
-                    codeTypeId: this.selectedCodeTypeId,
-                    attributeDetailId: this.selectedAttributeDetailId,
-                    sortOrder: this.settings.length + 1,
-                    separator: '-',
-                    isRequired: true
-                });
-
-                this.successMessage = 'Setting applied successfully!';
-
-                // Clear selections to allow adding more if desired
-                this.selectedCodeTypeId = null;
-                this.selectedAttributeDetailId = null;
-
-                setTimeout(() => this.successMessage = '', 2000);
-            } else {
-                this.errorMessage = 'This setting combination already exists in the list.';
-                setTimeout(() => this.errorMessage = '', 2000);
-            }
-        }
-    }
-
-    codeTypeId!: number;
-    detailIds: number[] = [];
-    savedCodes: string[] = [];
+    // Session log of successfully saved settings
+    savedSettings: SavedSetting[] = [];
 
     constructor(
-        private fb: FormBuilder,
         private codeTypeSettingService: CodeTypeSettingService,
-        private codeGeneratorService: CodeGeneratorService,
         private codeTypeService: CodeTypeService,
         private codeAttributeDetailService: CodeAttributeDetailService,
         private router: Router
     ) { }
 
-    ngOnInit() {
-        const state = this.codeGeneratorService.getState();
-        this.codeTypeId = state.codeTypeId ?? 0;
-        this.detailIds = state.codeAttributeDetailIds || [];
-
-        // Always load dropdown data so manual selection works
+    ngOnInit(): void {
         this.loadDropdownData();
-
-        // If we have details from previous step, auto-fill them
-        if (this.detailIds.length > 0) {
-            this.savedCodes = this.getSavedCodesFromDetails();
-            this.autoFillSettings();
-        } else {
-            this.savedCodes = [];
-            // We don't block anymore, just let the user add manually or see a softer message
-        }
     }
 
-    loadDropdownData() {
+    loadDropdownData(): void {
+        this.isLoadingData = true;
+
         this.codeTypeService.getAllCodeTypes().subscribe({
-            next: (response) => {
-                this.codeTypes = response.data;
-            },
-            error: (error) => {
-                console.error('Error loading code types:', error);
-            }
+            next: (res) => { this.codeTypes = res.data; this.checkLoadDone(); },
+            error: () => { this.checkLoadDone(); }
         });
 
-        // Load Code Attribute Details
         this.codeAttributeDetailService.getAllCodeAttributeDetails().subscribe({
-            next: (response) => {
-                this.codeAttributeDetails = response.data;
-            },
-            error: (error) => {
-                console.error('Error loading code attribute details:', error);
-            }
+            next: (res) => { this.codeAttributeDetails = res.data; this.checkLoadDone(); },
+            error: () => { this.checkLoadDone(); }
         });
     }
 
-    getSavedCodesFromDetails(): string[] {
-        // In production, fetch from API using detailIds
-        // For now, return placeholder codes in order based on detail IDs
-        // You would call an API endpoint like: GET /CodeAttributeDetails/{id}
-        return this.detailIds.map((id, index) => `CODE${index + 1}`);
+    private _loadCount = 0;
+    private checkLoadDone(): void {
+        this._loadCount++;
+        if (this._loadCount >= 2) this.isLoadingData = false;
     }
 
-    removeSetting(index: number) {
-        this.settings.splice(index, 1);
-        this.settings.forEach((s, i) => s.sortOrder = i + 1);
-        this.successMessage = 'Setting removed';
-        setTimeout(() => this.successMessage = '', 2000);
-    }
-
-    autoFillSettings() {
-        // Auto-create settings from the details saved in previous step
-        this.settings = this.detailIds.map((detailId, index) => ({
-            code: this.savedCodes[index] || `CODE${index + 1}`,
-            codeTypeId: this.codeTypeId,
-            attributeDetailId: detailId,
-            sortOrder: index + 1,
-            separator: '-',
-            isRequired: true
-        }));
-
-        this.successMessage = 'Settings loaded successfully!';
-    }
-
-    saveAllSettings() {
-        if (this.settings.length === 0) {
-            this.errorMessage = 'No settings to save.';
+    // Called for manual save
+    onSave(): void {
+        if (!this.selectedCodeTypeId || !this.selectedAttributeDetailId) {
+            this.errorMessage = 'Please select both Code Type and Attribute Detail.';
+            setTimeout(() => this.errorMessage = '', 3000);
             return;
         }
 
-        this.isLoading = true;
+        // Duplicate guard
+        const dup = this.savedSettings.some(
+            s => s.codeTypeLabel === this.getCodeTypeLabel(+this.selectedCodeTypeId!) &&
+                s.detailLabel === this.getDetailLabel(+this.selectedAttributeDetailId!)
+        );
+        if (dup) {
+            this.errorMessage = 'This Code Type + Detail combination was already saved.';
+            setTimeout(() => this.errorMessage = '', 3000);
+            return;
+        }
+
+        this.saveSettingNow();
+    }
+
+    saveSettingNow(): void {
+        if (!this.selectedCodeTypeId || !this.selectedAttributeDetailId) return;
+
+        this.isSaving = true;
         this.errorMessage = '';
         this.successMessage = '';
 
-        const settingRequests = this.settings.map((setting) => {
-            return this.codeTypeSettingService.createCodeTypeSetting({
-                codeTypeId: setting.codeTypeId,
-                attributeDetailId: setting.attributeDetailId,
-                sortOrder: setting.sortOrder,
-                separator: setting.separator,
-                isRequired: setting.isRequired
-            });
-        });
+        const payload = {
+            codeTypeId: +this.selectedCodeTypeId,
+            attributeDetailId: +this.selectedAttributeDetailId,
+            sortOrder: this.sortOrder,
+            separator: this.separator,
+            isRequired: this.isRequired
+        };
 
-        forkJoin(settingRequests).subscribe({
-            next: (responses) => {
-                this.savedSettingIds = responses.map(r => r.data.id);
-                this.isLoading = false;
-                this.successMessage = `All ${responses.length} settings saved successfully!`;
-                this.codeGeneratorService.completeStep(3);
+        this.codeTypeSettingService.createCodeTypeSetting(payload).subscribe({
+            next: (res) => {
+                this.isSaving = false;
+                this.savedSettings.unshift({
+                    id: res.data.id,
+                    codeTypeLabel: this.getCodeTypeLabel(+this.selectedCodeTypeId!),
+                    detailLabel: this.getDetailLabel(+this.selectedAttributeDetailId!),
+                    separator: res.data.separator,
+                    sortOrder: res.data.sortOrder,
+                    isRequired: res.data.isRequired
+                });
 
-                setTimeout(() => {
-                    this.router.navigate(['/code-sequence']);
-                }, 1500);
+                this.successMessage = `✓ Setting saved (ID: ${res.data.id})`;
+                this.sortOrder = this.savedSettings.length + 1;
+
+                this.selectedCodeTypeId = null;
+                this.selectedAttributeDetailId = null;
+
+                setTimeout(() => this.successMessage = '', 3000);
             },
-            error: (error) => {
-                this.isLoading = false;
-
-                // Handle 409 Conflict - settings already exist
-                if (error.status === 409) {
-                    this.successMessage = 'Settings already exist and loaded successfully!';
-                    this.codeGeneratorService.completeStep(3);
-
-                    setTimeout(() => {
-                        this.router.navigate(['/code-sequence']);
-                    }, 1500);
+            error: (err) => {
+                this.isSaving = false;
+                if (err.status === 409) {
+                    this.successMessage = 'Setting already exists.';
+                    this.selectedCodeTypeId = null;
+                    this.selectedAttributeDetailId = null;
+                    setTimeout(() => this.successMessage = '', 3000);
                 } else {
-                    this.errorMessage = error.error?.message || 'Failed to save settings. Please try again.';
+                    this.errorMessage = err.error?.message || 'Failed to save setting.';
                 }
             }
         });
     }
 
-    getFilteredSettings(): SettingDisplay[] {
-        let filtered = this.settings;
-
-        if (this.selectedCodeTypeId) {
-            filtered = filtered.filter(s => s.codeTypeId === this.selectedCodeTypeId);
+    continueToSequence(): void {
+        if (this.savedSettings.length === 0) {
+            this.errorMessage = 'Save at least one setting before continuing.';
+            return;
         }
+        this.router.navigate(['/code-sequence']);
+    }
 
-        if (this.selectedAttributeDetailId) {
-            filtered = filtered.filter(s => s.attributeDetailId === this.selectedAttributeDetailId);
-        }
-
-        return filtered;
+    removeSavedSetting(index: number): void {
+        this.savedSettings.splice(index, 1);
     }
 
     getCodeTypeLabel(id: number): string {
-        const codeType = this.codeTypes.find(ct => ct.id === id);
-        return codeType ? `${codeType.codeTypeCode} - ${codeType.nameEn}` : `ID: ${id}`;
+        const ct = this.codeTypes.find(c => c.id === id);
+        return ct ? `${ct.codeTypeCode} — ${ct.nameEn}` : `ID:${id}`;
     }
 
-    getAttributeDetailLabel(id: number): string {
-        const detail = this.codeAttributeDetails.find(ad => ad.id === id);
-        return detail ? `${detail.code} - ${detail.nameEn}` : `ID: ${id}`;
+    getDetailLabel(id: number): string {
+        const d = this.codeAttributeDetails.find(x => x.id === id);
+        return d ? `${d.code} — ${d.nameEn}` : `ID:${id}`;
     }
 }

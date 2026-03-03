@@ -2,135 +2,115 @@
     <!-- Page Header -->
     <div class="page-header">
         <div>
-            <h2 class="main-content-title tx-24 mg-b-5">Code Details Configuration</h2>
+            <h2 class="main-content-title tx-24 mg-b-5">Code Main Entry</h2>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="javascript:void(0)">Settings</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Code Details</li>
+                <li class="breadcrumb-item active" aria-current="page">Main Entry</li>
             </ol>
         </div>
+        <a routerLink="/all-main-entries" class="btn btn-outline-list">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <line x1="8" y1="6" x2="21" y2="6" />
+                <line x1="8" y1="12" x2="21" y2="12" />
+                <line x1="8" y1="18" x2="21" y2="18" />
+                <line x1="3" y1="6" x2="3.01" y2="6" />
+                <line x1="3" y1="12" x2="3.01" y2="12" />
+                <line x1="3" y1="18" x2="3.01" y2="18" />
+            </svg>
+            All Main Entries
+        </a>
     </div>
 
     <div class="content row row-sm">
         <div class="col-lg-12 col-md-12">
-            <!-- SECTION 1: CODE TYPE MAIN -->
             <div class="card custom-card">
                 <div class="card-body">
-                    <h3 class="card-title">1. Code Type Main</h3>
-                    <p class="card-description">Configure main entries and details in one streamlined page ({{
-                        mains.length }} entries added)</p>
+                    <h3 class="card-title">Add New Main Entry</h3>
+                    <p class="card-description">Enter details and add to your session list ({{ pendingMains.length }}
+                        added)</p>
 
                     <app-alert *ngIf="successMessage" type="success" [message]="successMessage"></app-alert>
                     <app-alert *ngIf="errorMessage" type="error" [message]="errorMessage"></app-alert>
 
-                    <form [formGroup]="mainForm" (ngSubmit)="onSubmitMain()" class="needs-validation" novalidate>
+                    @if (isLoadingData) {
+                    <div class="skeleton-wrap">
+                        <div class="skeleton-field"></div>
+                    </div>
+                    } @else {
+                    <form [formGroup]="mainForm" (ngSubmit)="onAddEntry()" class="needs-validation" novalidate>
+                        <!-- Selection -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="mainCodeTypeId" class="form-label">Code Type <span
                                         class="text-danger">*</span></label>
                                 <select id="mainCodeTypeId" class="form-control" formControlName="codeTypeId"
-                                    [class.is-invalid]="mainCodeTypeId?.invalid && mainCodeTypeId?.touched">
-                                    <option value="">Select Code Type</option>
-                                    @for (codeType of codeTypes; track codeType.id) {
-                                    <option [value]="codeType.id">
-                                        {{ codeType.codeTypeCode }} - {{ codeType.nameEn }}
-                                    </option>
+                                    [class.is-invalid]="codeTypeId?.invalid && codeTypeId?.touched">
+                                    <option value="">— Select —</option>
+                                    @for (ct of codeTypes; track ct.id) {
+                                    <option [value]="ct.id">{{ ct.codeTypeCode }} — {{ ct.nameEn }}</option>
                                     }
                                 </select>
-                                <div class="invalid-feedback"
-                                    *ngIf="mainCodeTypeId?.invalid && mainCodeTypeId?.touched">
-                                    Code Type is required
-                                </div>
                             </div>
-
                             <div class="col-md-6 mb-3">
-                                <label for="mainCodeAttributeTypeId" class="form-label">Code Attribute Type <span
+                                <label for="mainAttrTypeId" class="form-label">Attribute Type <span
                                         class="text-danger">*</span></label>
-                                <select id="mainCodeAttributeTypeId" class="form-control"
-                                    formControlName="codeAttributeTypeId"
-                                    [class.is-invalid]="mainCodeAttributeTypeId?.invalid && mainCodeAttributeTypeId?.touched">
-                                    <option value="">Select Code Attribute Type</option>
-                                    @for (attributeType of codeAttributeTypes; track attributeType.id) {
-                                    <option [value]="attributeType.id">{{ attributeType.nameEn }}</option>
+                                <select id="mainAttrTypeId" class="form-control" formControlName="codeAttributeTypeId"
+                                    [class.is-invalid]="codeAttributeTypeId?.invalid && codeAttributeTypeId?.touched">
+                                    <option value="">— Select —</option>
+                                    @for (at of codeAttributeTypes; track at.id) {
+                                    <option [value]="at.id">{{ at.nameEn }}</option>
                                     }
                                 </select>
-                                <div class="invalid-feedback"
-                                    *ngIf="mainCodeAttributeTypeId?.invalid && mainCodeAttributeTypeId?.touched">
-                                    Code Attribute Type is required
-                                </div>
                             </div>
                         </div>
 
+                        <!-- Basic -->
                         <div class="row">
                             <div class="col-md-12 mb-3">
                                 <label for="mainCode" class="form-label">Code <span class="text-danger">*</span></label>
                                 <input id="mainCode" type="text" class="form-control" formControlName="code"
-                                    placeholder="e.g., SYS, DEPT"
-                                    [class.is-invalid]="mainCode?.invalid && mainCode?.touched" />
-                                <div class="invalid-feedback" *ngIf="mainCode?.invalid && mainCode?.touched">
-                                    @if (mainCode?.errors?.['required']) {
-                                    Code is required
-                                    } @else if (mainCode?.errors?.['minlength']) {
-                                    Code must be at least 2 characters
-                                    }
-                                </div>
+                                    placeholder="e.g. CARD" [class.is-invalid]="code?.invalid && code?.touched" />
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="mainNameAr" class="form-label">Name (Arabic)</label>
-                                <input id="mainNameAr" type="text" class="form-control" formControlName="nameAr"
-                                    placeholder="الاسم بالعربية" dir="rtl" />
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="mainNameEn" class="form-label">Name (English) <span
+                                <label for="mainNameEn" class="form-label">Name (En) <span
                                         class="text-danger">*</span></label>
                                 <input id="mainNameEn" type="text" class="form-control" formControlName="nameEn"
                                     placeholder="English Name"
-                                    [class.is-invalid]="mainNameEn?.invalid && mainNameEn?.touched" />
-                                <div class="invalid-feedback" *ngIf="mainNameEn?.invalid && mainNameEn?.touched">
-                                    English name is required
-                                </div>
+                                    [class.is-invalid]="nameEn?.invalid && nameEn?.touched" />
                             </div>
-                        </div>
-
-                        <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="mainDescriptionAr" class="form-label">Description (Arabic)</label>
-                                <textarea id="mainDescriptionAr" class="form-control" formControlName="descriptionAr"
-                                    placeholder="الوصف بالعربية" dir="rtl" rows="3"></textarea>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="mainDescriptionEn" class="form-label">Description (English)</label>
-                                <textarea id="mainDescriptionEn" class="form-control" formControlName="descriptionEn"
-                                    placeholder="English Description" rows="3"></textarea>
+                                <label for="mainNameAr" class="form-label">Name (Ar)</label>
+                                <input id="mainNameAr" type="text" class="form-control" formControlName="nameAr"
+                                    placeholder="الاسم بالعربية" dir="rtl" />
                             </div>
                         </div>
 
                         <div class="d-flex justify-content-end mt-4">
-                            <button type="submit" class="btn btn-primary-save" [disabled]="isLoading || mainsSaved">
-                                Add Main
+                            <button type="submit" class="btn btn-primary-save">
+                                Add Entry
                             </button>
                         </div>
                     </form>
+                    }
                 </div>
             </div>
 
-            <!-- Added Mains List -->
-            <div class="card custom-card attributes-list-card" *ngIf="mains.length > 0">
+            <!-- Pending List -->
+            <div class="card custom-card attributes-list-card mt-4" *ngIf="pendingMains.length > 0">
                 <div class="card-body">
-                    <h3 class="card-title">Added Main Entries ({{ mains.length }})</h3>
-                    <p class="card-description">Review your main entries before saving</p>
+                    <h3 class="card-title">Added Main Entries ({{ pendingMains.length }})</h3>
+                    <p class="card-description">Review before saving to database</p>
 
                     <div class="attributes-items-container">
-                        @for (main of mains; track $index) {
+                        @for (item of pendingMains; track $index) {
                         <div class="attribute-item">
                             <div class="attribute-header">
-                                <h4>Main Entry #{{ $index + 1 }}</h4>
-                                <button type="button" class="btn btn-danger-delete" (click)="removeMain($index)"
-                                    [disabled]="isLoading || mainsSaved">
+                                <h4>Entry #{{ $index + 1 }} - {{ item.code }}</h4>
+                                <button type="button" class="btn btn-danger-delete" (click)="removePending($index)">
                                     <i class="fa fa-trash me-1"></i> Remove
                                 </button>
                             </div>
@@ -138,37 +118,21 @@
                                 <div class="detail-row">
                                     <div class="detail-item">
                                         <strong>Code Type</strong>
-                                        <span>{{ main.codeTypeId }}</span>
+                                        <span>{{ item.codeTypeLabel }}</span>
                                     </div>
                                     <div class="detail-item">
                                         <strong>Attribute Type</strong>
-                                        <span>{{ main.codeAttributeTypeId }}</span>
+                                        <span>{{ item.attrTypeLabel }}</span>
                                     </div>
                                 </div>
                                 <div class="detail-row mt-3">
-                                    <div class="detail-item w-100">
-                                        <strong>Code</strong>
-                                        <span>{{ main.code }}</span>
-                                    </div>
-                                </div>
-                                <div class="detail-row mt-3">
-                                    <div class="detail-item">
-                                        <strong>Name (Arabic)</strong>
-                                        <span dir="rtl">{{ main.nameAr }}</span>
-                                    </div>
                                     <div class="detail-item">
                                         <strong>Name (English)</strong>
-                                        <span>{{ main.nameEn }}</span>
-                                    </div>
-                                </div>
-                                <div class="detail-row mt-3">
-                                    <div class="detail-item">
-                                        <strong>Description (Arabic)</strong>
-                                        <span dir="rtl">{{ main.descriptionAr || '-' }}</span>
+                                        <span>{{ item.nameEn }}</span>
                                     </div>
                                     <div class="detail-item">
-                                        <strong>Description (English)</strong>
-                                        <span>{{ main.descriptionEn || '-' }}</span>
+                                        <strong>Name (Arabic)</strong>
+                                        <span dir="rtl">{{ item.nameAr }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -176,154 +140,14 @@
                         }
                     </div>
 
-                    <div class="d-flex justify-content-center mt-4">
-                        <button type="button" class="btn btn-primary-save btn-lg px-5" (click)="saveAllMains()"
-                            [disabled]="isLoading || mainsSaved">
-                            @if (isLoading) {
+                    <div class="d-flex justify-content-center mt-5">
+                        <button type="button" class="btn btn-primary-save btn-lg px-5" (click)="saveAllAndContinue()"
+                            [disabled]="isSaving">
+                            @if (isSaving) {
                             <span class="spinner-border spinner-border-sm me-1"></span>
-                            Saving All Mains...
-                            } @else if (mainsSaved) {
-                            <i class="fa fa-check me-1"></i> All Mains Saved
+                            Saving All...
                             } @else {
-                            Save All Mains & Continue to Details
-                            }
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECTION 2: CODE DETAILS -->
-            <div class="card custom-card mt-5" id="details-section" [class.section-locked]="!mainsSaved">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3 class="card-title mb-0">2. Code Details</h3>
-                        <div *ngIf="!mainsSaved" class="badge bg-warning text-dark px-3 py-2">
-                            <i class="fa fa-lock me-1"></i> Complete step 1 to unlock
-                        </div>
-                    </div>
-                    <p class="card-description">Define details - {{ details.length }} entries added</p>
-
-                    <div [class.content-disabled]="!mainsSaved">
-                        <form [formGroup]="detailForm" (ngSubmit)="onSubmitDetail()" class="needs-validation"
-                            novalidate>
-                            <div class="row">
-                                <div class="col-md-12 mb-3">
-                                    <label for="detailCode" class="form-label">Code <span
-                                            class="text-danger">*</span></label>
-                                    <input id="detailCode" type="text" class="form-control" formControlName="code"
-                                        placeholder="e.g., XYZ, ABC"
-                                        [class.is-invalid]="detailCode?.invalid && detailCode?.touched"
-                                        [disabled]="!mainsSaved" />
-                                    <div class="invalid-feedback" *ngIf="detailCode?.invalid && detailCode?.touched">
-                                        Code is required (min 2 chars)
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="detailNameAr" class="form-label">Name (Arabic)</label>
-                                    <input id="detailNameAr" type="text" class="form-control" formControlName="nameAr"
-                                        placeholder="الاسم بالعربية" dir="rtl" [disabled]="!mainsSaved" />
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label for="detailNameEn" class="form-label">Name (English) <span
-                                            class="text-danger">*</span></label>
-                                    <input id="detailNameEn" type="text" class="form-control" formControlName="nameEn"
-                                        placeholder="English Name"
-                                        [class.is-invalid]="detailNameEn?.invalid && detailNameEn?.touched"
-                                        [disabled]="!mainsSaved" />
-                                    <div class="invalid-feedback"
-                                        *ngIf="detailNameEn?.invalid && detailNameEn?.touched">
-                                        English name is required
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="detailDescriptionAr" class="form-label">Description (Arabic)</label>
-                                    <textarea id="detailDescriptionAr" class="form-control"
-                                        formControlName="descriptionAr" placeholder="الوصف بالعربية" dir="rtl" rows="3"
-                                        [disabled]="!mainsSaved"></textarea>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label for="detailDescriptionEn" class="form-label">Description (English)</label>
-                                    <textarea id="detailDescriptionEn" class="form-control"
-                                        formControlName="descriptionEn" placeholder="English Description" rows="3"
-                                        [disabled]="!mainsSaved"></textarea>
-                                </div>
-                            </div>
-
-                            <div class="d-flex justify-content-end mt-4">
-                                <button type="submit" class="btn btn-primary-save"
-                                    [disabled]="!mainsSaved || isLoading">
-                                    Add Detail
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Added Details List -->
-            <div class="card custom-card attributes-list-card" *ngIf="details.length > 0">
-                <div class="card-body">
-                    <h3 class="card-title">Added Detail Entries ({{ details.length }})</h3>
-                    <p class="card-description">Review your detail entries before saving</p>
-
-                    <div class="attributes-items-container">
-                        @for (detail of details; track $index) {
-                        <div class="attribute-item">
-                            <div class="attribute-header">
-                                <h4>Detail Entry #{{ $index + 1 }}</h4>
-                                <button type="button" class="btn btn-danger-delete" (click)="removeDetail($index)"
-                                    [disabled]="isLoading">
-                                    <i class="fa fa-trash me-1"></i> Remove
-                                </button>
-                            </div>
-                            <div class="attribute-details">
-                                <div class="detail-row">
-                                    <div class="detail-item w-100">
-                                        <strong>Code</strong>
-                                        <span>{{ detail.code }}</span>
-                                    </div>
-                                </div>
-                                <div class="detail-row mt-3">
-                                    <div class="detail-item">
-                                        <strong>Name (Arabic)</strong>
-                                        <span dir="rtl">{{ detail.nameAr }}</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <strong>Name (English)</strong>
-                                        <span>{{ detail.nameEn }}</span>
-                                    </div>
-                                </div>
-                                <div class="detail-row mt-3">
-                                    <div class="detail-item">
-                                        <strong>Description (Arabic)</strong>
-                                        <span dir="rtl">{{ detail.descriptionAr || '-' }}</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <strong>Description (English)</strong>
-                                        <span>{{ detail.descriptionEn || '-' }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        }
-                    </div>
-
-                    <div class="d-flex justify-content-center mt-4">
-                        <button type="button" class="btn btn-primary-save btn-lg px-5" (click)="saveAllDetails()"
-                            [disabled]="isLoading">
-                            @if (isLoading) {
-                            <span class="spinner-border spinner-border-sm me-1"></span>
-                            Saving All Details...
-                            } @else {
-                            Save All Details & Complete
+                            Save All & Continue to Details
                             }
                         </button>
                     </div>

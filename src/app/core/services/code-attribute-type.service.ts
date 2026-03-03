@@ -3,6 +3,17 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+export interface CodeAttributeTypeItem {
+    id: number;
+    nameAr: string;
+    nameEn: string;
+    descriptionAr: string;
+    descriptionEn: string;
+    isActive: boolean;
+    createdAt: string;
+    createdBy: string;
+}
+
 export interface CodeAttributeTypeRequest {
     nameAr: string;
     nameEn: string;
@@ -10,34 +21,24 @@ export interface CodeAttributeTypeRequest {
     descriptionEn: string;
 }
 
+export interface CodeAttributeTypeUpdateRequest {
+    nameAr: string;
+    nameEn: string;
+    descriptionAr: string;
+    descriptionEn: string;
+    isActive: boolean;
+}
+
 export interface CodeAttributeTypeResponse {
     statusCode: number;
     message: string;
-    data: {
-        id: number;
-        nameAr: string;
-        nameEn: string;
-        descriptionAr: string;
-        descriptionEn: string;
-        isActive: boolean;
-        createdAt: string;
-        createdBy: string;
-    };
+    data: CodeAttributeTypeItem;
 }
 
 export interface CodeAttributeTypeListResponse {
     statusCode: number;
     message: string;
-    data: {
-        id: number;
-        nameAr: string;
-        nameEn: string;
-        descriptionAr: string;
-        descriptionEn: string;
-        isActive: boolean;
-        createdAt: string;
-        createdBy: string;
-    }[];
+    data: CodeAttributeTypeItem[];
 }
 
 @Injectable({
@@ -58,6 +59,13 @@ export class CodeAttributeTypeService {
     getAllCodeAttributeTypes(): Observable<CodeAttributeTypeListResponse> {
         return this.http.get<CodeAttributeTypeListResponse>(
             `${this.apiUrl}/CodeAttributeTypes/GetAll`
+        );
+    }
+
+    updateCodeAttributeType(id: number, data: CodeAttributeTypeUpdateRequest): Observable<CodeAttributeTypeResponse> {
+        return this.http.put<CodeAttributeTypeResponse>(
+            `${this.apiUrl}/CodeAttributeTypes/Update?id=${id}`,
+            data
         );
     }
 }
